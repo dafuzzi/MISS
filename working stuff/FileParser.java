@@ -9,8 +9,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.LinkedList;
 
-import android.os.Environment;
-import android.util.Log;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 public class FileParser {
 	private FileInputStream fis;
@@ -23,44 +23,80 @@ public class FileParser {
 	private LinkedList<Station> foundStations;
 	private LinkedList<Client> foundClients;
 	private Boolean doParse;
+	private DateTimeFormatter formatter;
 
 	public FileParser(File filePath) {
 		super();
 		doParse = false;
-		clientParts = new String[7];
-		stationParts = new String[14];
-		foundStations = new LinkedList<Station>();
-		foundClients = new LinkedList<Client>();
-		try {
-			file = filePath;
-			fis = new FileInputStream(file);
-			dis = new DataInputStream(fis);
-			br = new BufferedReader(new InputStreamReader(dis));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
+		formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
+		file = filePath;
 	}
 
 	public LinkedList<Station> parseForStations() {
-		foundStations.clear();
+		foundStations = new LinkedList<Station>();
+		stationParts = new String[14];
+		doParse = false;
 		try {
-			while (br.readLine() != null) {
-				line = br.readLine();
-				if(line.contains("BSSID")){
+			fis = new FileInputStream(file);
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		}
+		dis = new DataInputStream(fis);
+		br = new BufferedReader(new InputStreamReader(dis));
+		try {
+			while ((line = br.readLine()) != null) {
+				if (line.contains("BSSID")) {
 					doParse = true;
 					continue;
-				}else if(line.contains("Station Mac")){
+				} else if (line.contains("Station MAC")) {
 					doParse = false;
 					break;
 				}
-				if(doParse){
-					stationParts = line.split(" *, *", 14);
-					
+				if (doParse) {
+					stationParts = line.split("[ ]*,[ ]*", 14);
+					if (stationParts.length == 14) {
+						foundStations.add(new Station(stationParts[0], formatter.parseDateTime(stationParts[1]), formatter.parseDateTime(stationParts[2]), Integer
+								.parseInt(stationParts[3]), Integer.parseInt(stationParts[4]), stationParts[5], stationParts[6], stationParts[7],
+								Integer.parseInt(stationParts[8]), Integer.parseInt(stationParts[9]), Integer.parseInt(stationParts[10]), stationParts[11], Integer
+										.parseInt(stationParts[12]), stationParts[13]));
+					}
 				}
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return null;
+		return foundStations;
+	}
+
+	public LinkedList<Client> parseForClients() {
+		foundClients = new LinkedList<Client>();
+		clientParts = new String[7];
+		doParse = false;
+		try {
+			fis = new FileInputStream(file);
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		}
+		dis = new DataInputStream(fis);
+		br = new BufferedReader(new InputStreamReader(dis));
+		try {
+			String line;
+			while ((line = br.readLine()) != null) {
+				if (line.contains("Station")) {
+					doParse = true;
+					continue;
+				}
+				if (doParse) {
+					clientParts = line.split("[ ]*,[ ]*", 7);
+					if (clientParts.length == 7) {
+						foundClients.add(new Client(clientParts[0], formatter.parseDateTime(clientParts[1]), formatter.parseDateTime(clientParts[2]), Integer
+								.parseInt(clientParts[3]), Integer.parseInt(clientParts[4]), clientParts[5], clientParts[6]));
+					}
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return foundClients;
 	}
 }

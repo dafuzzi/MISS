@@ -1,20 +1,20 @@
 package com.example.testservice;
 
-import java.util.LinkedList;
+import org.joda.time.DateTime;
 
 public class Client {
 	private String MAC;
-	private String firstTimeSeen; //TODO jodatime
-	private String lastTimeSeen;	//TODO jodatime
+	private DateTime firstTimeSeen; 
+	private DateTime lastTimeSeen;	
 	private int power;
 	private int packets;
 	private String BSSID;
-	private LinkedList<String> ESSID;
+	private String ESSID;
 	
-	public Client(String mAC, String firstTimeSeen, String lastTimeSeen,
-			int power, int packets, String bSSID, LinkedList<String> eSSID) {
+	public Client(String MAC, DateTime firstTimeSeen, DateTime lastTimeSeen,
+			int power, int packets, String bSSID, String eSSID) {
 		super();
-		MAC = mAC;
+		this.MAC = MAC;
 		this.firstTimeSeen = firstTimeSeen;
 		this.lastTimeSeen = lastTimeSeen;
 		this.power = power;
@@ -27,23 +27,23 @@ public class Client {
 		return MAC;
 	}
 
-	public void setMAC(String mAC) {
-		MAC = mAC;
+	public void setMAC(String MAC) {
+		this.MAC = MAC;
 	}
 
-	public String getFirstTimeSeen() {
+	public DateTime getFirstTimeSeen() {
 		return firstTimeSeen;
 	}
 
-	public void setFirstTimeSeen(String firstTimeSeen) {
+	public void setFirstTimeSeen(DateTime firstTimeSeen) {
 		this.firstTimeSeen = firstTimeSeen;
 	}
 
-	public String getLastTimeSeen() {
+	public DateTime getLastTimeSeen() {
 		return lastTimeSeen;
 	}
 
-	public void setLastTimeSeen(String lastTimeSeen) {
+	public void setLastTimeSeen(DateTime lastTimeSeen) {
 		this.lastTimeSeen = lastTimeSeen;
 	}
 
@@ -71,11 +71,11 @@ public class Client {
 		BSSID = bSSID;
 	}
 
-	public LinkedList<String> getESSID() {
+	public String getESSID() {
 		return ESSID;
 	}
 
-	public void setESSID(LinkedList<String> eSSID) {
+	public void setESSID(String eSSID) {
 		ESSID = eSSID;
 	}
 	

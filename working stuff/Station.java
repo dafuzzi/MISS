@@ -1,10 +1,12 @@
 package com.example.testservice;
 
+import org.joda.time.DateTime;
+
 
 public class Station {
 	private String MAC;
-	private String firstTimeSeen; //TODO jodatime
-	private String lastTimeSeen;	//TODO jodatime
+	private DateTime firstTimeSeen; 
+	private DateTime lastTimeSeen;
 	private int channel;
 	private int speed;
 	private String privacy;
@@ -17,12 +19,12 @@ public class Station {
 	private int idLength;
 	private String ESSID;
 	
-	public Station(String mAC, String firstTimeSeen, String lastTimeSeen,
+	public Station(String MAC, DateTime firstTimeSeen, DateTime lastTimeSeen,
 			int channel, int speed, String privacy, String authentication,
 			String cipher, int power, int beacons, int iv, String ip,
 			int idLength, String eSSID) {
 		super();
-		MAC = mAC;
+		this.MAC = MAC;
 		this.firstTimeSeen = firstTimeSeen;
 		this.lastTimeSeen = lastTimeSeen;
 		this.channel = channel;
@@ -42,23 +44,23 @@ public class Station {
 		return MAC;
 	}
 
-	public void setMAC(String mAC) {
-		MAC = mAC;
+	public void setMAC(String MAC) {
+		this.MAC = MAC;
 	}
 
-	public String getFirstTimeSeen() {
+	public DateTime getFirstTimeSeen() {
 		return firstTimeSeen;
 	}
 
-	public void setFirstTimeSeen(String firstTimeSeen) {
+	public void setFirstTimeSeen(DateTime firstTimeSeen) {
 		this.firstTimeSeen = firstTimeSeen;
 	}
 
-	public String getLastTimeSeen() {
+	public DateTime getLastTimeSeen() {
 		return lastTimeSeen;
 	}
 
-	public void setLastTimeSeen(String lastTimeSeen) {
+	public void setLastTimeSeen(DateTime lastTimeSeen) {
 		this.lastTimeSeen = lastTimeSeen;
 	}
 
