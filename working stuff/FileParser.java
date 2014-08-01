@@ -12,7 +12,12 @@ import java.util.LinkedList;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
+import android.util.Log;
+
+
 public class FileParser {
+	private static final String STATION = "BSSID, First time seen, Last time seen, channel, Speed, Privacy, Cipher, Authentication, Power, # beacons, # IV, LAN IP, ID-length, ESSID, Key";
+	private static final String CLIENT = "Station MAC, First time seen, Last time seen, Power, # packets, BSSID, Probed ESSIDs";
 	private FileInputStream fis;
 	private BufferedReader br;
 	private DataInputStream dis;
@@ -45,16 +50,16 @@ public class FileParser {
 		br = new BufferedReader(new InputStreamReader(dis));
 		try {
 			while ((line = br.readLine()) != null) {
-				if (line.contains("BSSID")) {
+				if (line.contains(STATION)) {
 					doParse = true;
 					continue;
-				} else if (line.contains("Station MAC")) {
+				}else if (line.contains(CLIENT)) {
 					doParse = false;
 					break;
 				}
 				if (doParse) {
-					stationParts = line.split("[ ]*,[ ]*", 14);
-					if (stationParts.length == 14) {
+					stationParts = line.split("[ ]*,[ ]*", 15);
+					if (stationParts.length == 15) {
 						foundStations.add(new Station(stationParts[0], formatter.parseDateTime(stationParts[1]), formatter.parseDateTime(stationParts[2]), Integer
 								.parseInt(stationParts[3]), Integer.parseInt(stationParts[4]), stationParts[5], stationParts[6], stationParts[7],
 								Integer.parseInt(stationParts[8]), Integer.parseInt(stationParts[9]), Integer.parseInt(stationParts[10]), stationParts[11], Integer
@@ -82,7 +87,7 @@ public class FileParser {
 		try {
 			String line;
 			while ((line = br.readLine()) != null) {
-				if (line.contains("Station")) {
+				if (line.contains(CLIENT)) {
 					doParse = true;
 					continue;
 				}
