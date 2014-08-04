@@ -16,46 +16,105 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.Toast;
+import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.ToggleButton;
 
 public class MainActivity extends ActionBarActivity {
 
+	private LinkedList<Client> searchList = new LinkedList<Client>();
+
+	public String pathToAppData;
+	String captureFile;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-
-		// Global shit i have to use more than once
-		String pathToAppData = this.getFilesDir().toString();
+		pathToAppData = this.getFilesDir().toString();
 		String scriptNames[] = { "removeCaptureFiles.sh", "startCapture.sh", "stopCapture.sh" };
-		String captureFile = "capture-01.csv";
-		
+		captureFile = "capture-01.csv";
+
 		Boolean init = false;
 		for (String file : scriptNames) {
-			if(!(new File(pathToAppData+"/"+file).exists())){
+			if (!(new File(pathToAppData + "/" + file).exists())) {
 				init = true;
 			}
 		}
-		if(init){
-			if(generateScriptsFromAssets(scriptNames)){
-				makeScriptsExecutable(scriptNames);
-			}
+		if (init) {
+			generateScriptsFromAssets(scriptNames);
+			makeScriptsExecutable(pathToAppData, scriptNames);
 		}
-		
+
+		final Button deleteButton = (Button) findViewById(R.id.button1);
+
+		deleteButton.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				executer("su -c /data/data/com.example.testservice/files/removeCaptureFiles.sh");
+			}
+		});
+
+		final Button addButton = (Button) findViewById(R.id.button2);
+
+		addButton.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// TODO read textview
+			}
+		});
+
+		ToggleButton scan = (ToggleButton) findViewById(R.id.toggleButton1);
+
+		scan.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				if (isChecked) {
+					executer("su -c /data/data/com.example.testservice/files/startCapture.sh");
+					executer("echo on");
+				} else {
+					executer("su -c /data/data/com.example.testservice/files/startCapture.sh");
+					executer("echo off");
+					check();
+				}
+			}
+		});
 		// Restarts service when app is rebuild. Line have to be removed in
 		// final version.
 		// startService(new Intent(context,MyService.class));
-
-		// File filePath = new File(this.getFilesDir(), "capture-01.csv");
-		// File path = new File(this.getFilesDir().toString());
-		// FileParser fp = new FileParser(filePath);
-
-		// LinkedList<Station> fs = fp.parseForStations();
-		// LinkedList<Client> fc = fp.parseForClients();
-		// Log.d("Parser", "Number of found stations: " + fs.size());
-		// Log.d("Parser", "Number of found clients: " + fc.size());
-
 	}
-	
+	public void check(){		
+		if ((new File(pathToAppData + "/" + captureFile).exists())) {
+			File filePath = new File(this.getFilesDir(), "capture-01.csv");
+			FileParser fp = new FileParser(filePath);
+			LinkedList<Client> fc = fp.parseForClients();
+			Log.d("Parser", "Number of found clients: " + fc.size());
+
+			// LinkedList<Station> fs = fp.parseForStations();
+			// Log.d("Parser", "Number of found stations: " + fs.size());
+
+			Client sebaPhone = new Client("SEBA","3C:C2:43:C9:6D:9C");
+			Client mePhone = new Client("FUZZI","90:27:E4:32:F2:03");
+			searchList.add(sebaPhone);
+			searchList.add(mePhone);
+
+			for (Client client : searchList) {
+				for (Client found : fc) {
+					if (client.getMAC().equals(found.getMAC())) {
+						Toast.makeText(this, "Found Client: " + client.getMAC(), Toast.LENGTH_LONG).show();
+						continue;
+					}
+				}
+			}
+		}
+	}
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -92,8 +151,8 @@ public class MainActivity extends ActionBarActivity {
 		String response = output.toString();
 		Log.d("Shell", response);
 	}
-	
-	private boolean generateScriptsFromAssets(String files[]){
+
+	private boolean generateScriptsFromAssets(String files[]) {
 		try {
 			for (String file : files) {
 				String data = "";
@@ -104,7 +163,7 @@ public class MainActivity extends ActionBarActivity {
 				StringBuilder stringBuilder = new StringBuilder();
 
 				while ((receiveString = bufferedReader.readLine()) != null) {
-					stringBuilder.append(receiveString+"\n");
+					stringBuilder.append(receiveString + "\n");
 				}
 
 				inputStream.close();
@@ -122,9 +181,13 @@ public class MainActivity extends ActionBarActivity {
 		return true;
 	}
 
-	private void makeScriptsExecutable(String[] scriptNames) {
-		
-		
+	private void makeScriptsExecutable(String path, String[] scriptNames) {
+		String abs;
+		for (String file : scriptNames) {
+			abs = path + "/" + file;
+			executer("chmod a+x " + abs);
+		}
+
 	}
 
 }

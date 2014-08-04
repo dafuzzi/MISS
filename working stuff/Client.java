@@ -3,17 +3,22 @@ package com.example.testservice;
 import org.joda.time.DateTime;
 
 public class Client {
+	private String customName;
 	private String MAC;
-	private DateTime firstTimeSeen; 
-	private DateTime lastTimeSeen;	
+	private DateTime firstTimeSeen;
+	private DateTime lastTimeSeen;
 	private int power;
 	private int packets;
 	private String BSSID;
 	private String ESSID;
-	
-	public Client(String MAC, DateTime firstTimeSeen, DateTime lastTimeSeen,
-			int power, int packets, String bSSID, String eSSID) {
-		super();
+
+	public Client(String customName, String MAC) {
+		this.customName = customName;
+		this.MAC = MAC;
+	}
+
+	public Client(String customName, String MAC, DateTime firstTimeSeen, DateTime lastTimeSeen, int power, int packets, String bSSID, String eSSID) {
+		this.customName = customName;
 		this.MAC = MAC;
 		this.firstTimeSeen = firstTimeSeen;
 		this.lastTimeSeen = lastTimeSeen;
@@ -21,6 +26,13 @@ public class Client {
 		this.packets = packets;
 		BSSID = bSSID;
 		ESSID = eSSID;
+	}
+	public String getCustomName() {
+		return customName;
+	}
+
+	public void setCustomName(String customName) {
+		this.customName = customName;
 	}
 
 	public String getMAC() {
@@ -78,6 +90,5 @@ public class Client {
 	public void setESSID(String eSSID) {
 		ESSID = eSSID;
 	}
-	
-	
+
 }

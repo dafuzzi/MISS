@@ -4,6 +4,7 @@ import org.joda.time.DateTime;
 
 
 public class Station {
+	private String customName;
 	private String MAC;
 	private DateTime firstTimeSeen; 
 	private DateTime lastTimeSeen;
@@ -19,11 +20,15 @@ public class Station {
 	private int idLength;
 	private String ESSID;
 	
-	public Station(String MAC, DateTime firstTimeSeen, DateTime lastTimeSeen,
+	public Station(String customName, String MAC){
+		this.customName = customName;
+		this.MAC = MAC;
+	}
+	public Station(String customName, String MAC, DateTime firstTimeSeen, DateTime lastTimeSeen,
 			int channel, int speed, String privacy, String authentication,
 			String cipher, int power, int beacons, int iv, String ip,
 			int idLength, String eSSID) {
-		super();
+		this.customName = customName;
 		this.MAC = MAC;
 		this.firstTimeSeen = firstTimeSeen;
 		this.lastTimeSeen = lastTimeSeen;
@@ -39,7 +44,13 @@ public class Station {
 		this.idLength = idLength;
 		ESSID = eSSID;
 	}
-
+	
+	public String getCustomName() {
+		return customName;
+	}
+	public void setCustomName(String customName) {
+		this.customName = customName;
+	}
 	public String getMAC() {
 		return MAC;
 	}

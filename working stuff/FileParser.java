@@ -60,7 +60,7 @@ public class FileParser {
 				if (doParse) {
 					stationParts = line.split("[ ]*,[ ]*", 15);
 					if (stationParts.length == 15) {
-						foundStations.add(new Station(stationParts[0], formatter.parseDateTime(stationParts[1]), formatter.parseDateTime(stationParts[2]), Integer
+						foundStations.add(new Station("unnamed",stationParts[0], formatter.parseDateTime(stationParts[1]), formatter.parseDateTime(stationParts[2]), Integer
 								.parseInt(stationParts[3]), Integer.parseInt(stationParts[4]), stationParts[5], stationParts[6], stationParts[7],
 								Integer.parseInt(stationParts[8]), Integer.parseInt(stationParts[9]), Integer.parseInt(stationParts[10]), stationParts[11], Integer
 										.parseInt(stationParts[12]), stationParts[13]));
@@ -94,7 +94,7 @@ public class FileParser {
 				if (doParse) {
 					clientParts = line.split("[ ]*,[ ]*", 7);
 					if (clientParts.length == 7) {
-						foundClients.add(new Client(clientParts[0], formatter.parseDateTime(clientParts[1]), formatter.parseDateTime(clientParts[2]), Integer
+						foundClients.add(new Client("unnamed",clientParts[0], formatter.parseDateTime(clientParts[1]), formatter.parseDateTime(clientParts[2]), Integer
 								.parseInt(clientParts[3]), Integer.parseInt(clientParts[4]), clientParts[5], clientParts[6]));
 					}
 				}
