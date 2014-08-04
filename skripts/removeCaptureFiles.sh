@@ -1,1 +1,1 @@
-rm /datadata/com.example.testservice/files/capture*
+rm /datadata/com.example.testservice/files/capture* 2>&1
