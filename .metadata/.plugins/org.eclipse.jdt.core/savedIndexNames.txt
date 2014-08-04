@@ -1,0 +1,4 @@
+INDEX VERSION 1.126+/Users/Fuzzi/Projekte/dbis/MISS/.metadata/.plugins/org.eclipse.jdt.core
+4034033598.index
+2411809216.index
+1270315800.index
