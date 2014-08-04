@@ -79,8 +79,7 @@ public class MainActivity extends ActionBarActivity {
 					executer("su -c /data/data/com.example.testservice/files/startCapture.sh");
 					executer("echo on");
 				} else {
-					executer("su -c /data/data/com.example.testservice/files/startCapture.sh");
-					executer("echo off");
+					executer("su -c /data/data/com.example.testservice/files/stopCapture.sh");
 					check();
 				}
 			}
@@ -99,15 +98,15 @@ public class MainActivity extends ActionBarActivity {
 			// LinkedList<Station> fs = fp.parseForStations();
 			// Log.d("Parser", "Number of found stations: " + fs.size());
 
-			Client sebaPhone = new Client("SEBA","3C:C2:43:C9:6D:9C");
-			Client mePhone = new Client("FUZZI","90:27:E4:32:F2:03");
+			Client sebaPhone = new Client("Seba's Phone","3C:C2:43:C9:6D:9C");
+			Client mePhone = new Client("Fuzzi's Phone","90:27:E4:32:F2:03");
 			searchList.add(sebaPhone);
 			searchList.add(mePhone);
 
 			for (Client client : searchList) {
 				for (Client found : fc) {
 					if (client.getMAC().equals(found.getMAC())) {
-						Toast.makeText(this, "Found Client: " + client.getMAC(), Toast.LENGTH_LONG).show();
+						Toast.makeText(this, "Found Client: " + client.getCustomName(), Toast.LENGTH_LONG).show();
 						continue;
 					}
 				}
