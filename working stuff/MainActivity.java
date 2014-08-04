@@ -94,14 +94,16 @@ public class MainActivity extends ActionBarActivity {
 			FileParser fp = new FileParser(filePath);
 			LinkedList<Client> fc = fp.parseForClients();
 			Log.d("Parser", "Number of found clients: " + fc.size());
+			Toast.makeText(this, "Number of Client: " + fc.size(), Toast.LENGTH_LONG).show();
 
-			// LinkedList<Station> fs = fp.parseForStations();
-			// Log.d("Parser", "Number of found stations: " + fs.size());
+			LinkedList<Station> fs = fp.parseForStations();
+			Log.d("Parser", "Number of found stations: " + fs.size());
+			Toast.makeText(this, "Number of Stations: " + fs.size(), Toast.LENGTH_LONG).show();
 
-			Client sebaPhone = new Client("Seba's Phone","3C:C2:43:C9:6D:9C");
-			Client mePhone = new Client("Fuzzi's Phone","90:27:E4:32:F2:03");
-			searchList.add(sebaPhone);
-			searchList.add(mePhone);
+			searchList.add(new Client("Seba's Phone","3C:C2:43:C9:6D:9C"));
+			searchList.add(new Client("Fuzzi's Phone","90:27:E4:32:F2:03"));
+			searchList.add(new Client("Random Stanger 1","00:19:07:07:C5:B0"));
+			searchList.add(new Client("Random Stanger 2","00:1F:CA:CB:6B:E0"));
 
 			for (Client client : searchList) {
 				for (Client found : fc) {
@@ -134,21 +136,21 @@ public class MainActivity extends ActionBarActivity {
 	}
 
 	private void executer(String command) {
-		StringBuffer output = new StringBuffer();
+//		StringBuffer output = new StringBuffer();
 		Process p;
 		try {
 			p = Runtime.getRuntime().exec(command);
-			p.waitFor();
-			BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-			String line = "";
-			while ((line = reader.readLine()) != null) {
-				output.append(line + "\n");
-			}
+//			p.waitFor();
+//			BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+//			String line = "";
+//			while ((line = reader.readLine()) != null) {
+//				output.append(line + "\n");
+//			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		String response = output.toString();
-		Log.d("Shell", response);
+//		String response = output.toString();
+//		Log.d("Shell", response);
 	}
 
 	private boolean generateScriptsFromAssets(String files[]) {
