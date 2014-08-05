@@ -16,24 +16,18 @@ import android.widget.Toast;
  * @author Fabian Schwab
  * 
  */
-public class MISService extends Service implements Runnable{
+public class MISService extends Service {
 
 	private LinkedList<Client> clients;
 	private LinkedList<Station> stations;
-	private LinkedList<Station> knownNetworks;
 	
-	private WifiManager wifi;
-	private ConnectivityManager connectionManager;
-	private NetworkInfo networkInfo;
+	Thread scanner;
 
 	public MISService() {
 		clients = new LinkedList<Client>();
 		stations = new LinkedList<Station>();
 		
-		wifi = (WifiManager)getSystemService(Context.WIFI_SERVICE);
-		
-		connectionManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-		networkInfo = connectionManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+		scanner = new Thread( new AirTrafficAnalyzer(stations,clients));
 	}
 
 	@Override
@@ -41,8 +35,10 @@ public class MISService extends Service implements Runnable{
 		// TODO create ServiceLogic thread and start
 		Log.d("SERVICE", "Service is running");
 		Toast.makeText(this, "Started MISS", Toast.LENGTH_LONG).show();
+		if(!scanner.isAlive()){
+			scanner.start();
+		}
 		return Service.START_STICKY;
-
 	}
 
 	@Override
@@ -150,9 +146,17 @@ public class MISService extends Service implements Runnable{
 		return null;
 	}
 
+	/**
+	 * @return
+	 */
+	protected LinkedList<Station> getStations() {
+		return stations;
+	}
 
-	@Override
-	public void run() {
-		
+	/**
+	 * @return
+	 */
+	protected LinkedList<Client> getClients() {
+		return clients;
 	}
 }

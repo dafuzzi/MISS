@@ -31,22 +31,4 @@ proguard/
 
 *.snap
 
-.metadata/.plugins/org.eclipse.core.resources/.projects/MISS/.indexes/a0/de/history.index
-
-.metadata/.plugins/org.eclipse.core.resources/.projects/appcompat_v7/.syncinfo.snap
-
-.metadata/.plugins/org.eclipse.core.resources/.projects/MISS/.indexes/e4/81/21/fc/history.index
-
-.metadata/.plugins/org.eclipse.core.resources/.projects/MISS/.indexes/history.index
-
-.metadata/.plugins/org.eclipse.core.resources/.projects/MISS/.markers.snap
-
-.metadata/.plugins/org.eclipse.core.resources/.projects/MISS/.syncinfo.snap
-
-.metadata/.plugins/org.eclipse.core.resources/.root/.markers.snap
-
-.metadata/.plugins/org.eclipse.core.resources/.safetable/org.eclipse.core.resources
-
-.metadata/.plugins/org.eclipse.core.resources/.snap
-
-.metadata/.plugins/org.eclipse.jdt.core/4034033598.index
+.metadata/
