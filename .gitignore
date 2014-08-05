@@ -31,4 +31,7 @@ proguard/
 
 *.snap
 
-.metadata/
+.metadata/*
+.metadata/.plugins/org.eclipse.core.resources/.projects/MISS/.indexes/properties.index
+
+.metadata/.plugins/org.eclipse.debug.core/.launches/MISS.launch

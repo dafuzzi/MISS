@@ -1,5 +1,11 @@
 package de.uulm.miss;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.LinkedList;
 
 import android.app.Service;
@@ -20,14 +26,34 @@ public class MISService extends Service {
 
 	private LinkedList<Client> clients;
 	private LinkedList<Station> stations;
-	
+
+	private String pathToAppData;
+	private String captureFile;
+	private String scriptNames[];
+
 	Thread scanner;
 
 	public MISService() {
 		clients = new LinkedList<Client>();
 		stations = new LinkedList<Station>();
-		
-		scanner = new Thread( new AirTrafficAnalyzer(stations,clients));
+
+		pathToAppData = this.getFilesDir().toString();
+		captureFile = "capture-01.csv";
+		scriptNames = new String[] { "removeCaptureFiles.sh", "startCapture.sh", "stopCapture.sh" };
+
+		Boolean init = false;
+		for (String file : scriptNames) {
+			if (!(new File(pathToAppData + "/" + file).exists())) {
+				init = true;
+			}
+		}
+		if (init) {
+			generateScriptsFromAssets(scriptNames);
+			makeScriptsExecutable(pathToAppData, scriptNames);
+		}
+
+		//scanner = new Thread(new AirTrafficAnalyzer(stations, clients));
+
 	}
 
 	@Override
@@ -35,7 +61,7 @@ public class MISService extends Service {
 		// TODO create ServiceLogic thread and start
 		Log.d("SERVICE", "Service is running");
 		Toast.makeText(this, "Started MISS", Toast.LENGTH_LONG).show();
-		if(!scanner.isAlive()){
+		if (!scanner.isAlive()) {
 			scanner.start();
 		}
 		return Service.START_STICKY;
@@ -50,6 +76,64 @@ public class MISService extends Service {
 	@Override
 	public boolean stopService(Intent name) {
 		return super.stopService(name);
+	}
+
+	/**
+	 * @param files
+	 * @return
+	 */
+	private boolean generateScriptsFromAssets(String files[]) {
+		try {
+			for (String file : files) {
+				String data = "";
+				InputStream inputStream = this.getAssets().open(file);
+				InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+				BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+				String receiveString = "";
+				StringBuilder stringBuilder = new StringBuilder();
+
+				while ((receiveString = bufferedReader.readLine()) != null) {
+					stringBuilder.append(receiveString + "\n");
+				}
+
+				inputStream.close();
+				data = stringBuilder.toString();
+
+				OutputStreamWriter outputStreamWriter = new OutputStreamWriter(openFileOutput(file, MODE_PRIVATE));
+				outputStreamWriter.write(data);
+				outputStreamWriter.close();
+			}
+
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * @param path
+	 * @param scriptNames
+	 */
+	private void makeScriptsExecutable(String path, String[] scriptNames) {
+		String abs;
+		for (String file : scriptNames) {
+			abs = path + "/" + file;
+			executer("chmod a+x " + abs);
+		}
+
+	}
+
+	/**
+	 * @param command
+	 */
+	private void executer(String command) {
+		Process p;
+		try {
+			p = Runtime.getRuntime().exec(command);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
