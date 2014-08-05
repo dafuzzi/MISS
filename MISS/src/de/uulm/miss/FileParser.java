@@ -12,6 +12,10 @@ import java.util.LinkedList;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
+/**
+ * @author Fabian Schwab
+ *
+ */
 public class FileParser {
 	private static final String STATION = "BSSID, First time seen, Last time seen, channel, Speed, Privacy, Cipher, Authentication, Power, # beacons, # IV, LAN IP, ID-length, ESSID, Key";
 	private static final String CLIENT = "Station MAC, First time seen, Last time seen, Power, # packets, BSSID, Probed ESSIDs";
@@ -27,6 +31,9 @@ public class FileParser {
 	private Boolean doParse;
 	private DateTimeFormatter formatter;
 
+	/**
+	 * @param filePath
+	 */
 	public FileParser(File filePath) {
 		super();
 		doParse = false;
@@ -34,6 +41,9 @@ public class FileParser {
 		file = filePath;
 	}
 
+	/**
+	 * @return
+	 */
 	public LinkedList<Station> parseForStations() {
 		foundStations = new LinkedList<Station>();
 		stationParts = new String[14];
@@ -70,6 +80,9 @@ public class FileParser {
 		return foundStations;
 	}
 
+	/**
+	 * @return
+	 */
 	public LinkedList<Client> parseForClients() {
 		foundClients = new LinkedList<Client>();
 		clientParts = new String[7];
