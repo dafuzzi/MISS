@@ -1,19 +1,8 @@
 package de.uulm.miss;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.util.LinkedList;
-
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.net.wifi.WifiManager;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
@@ -27,32 +16,19 @@ public class MISService extends Service {
 	private LinkedList<Client> clients;
 	private LinkedList<Station> stations;
 
-	private String pathToAppData;
-	private String captureFile;
-	private String scriptNames[];
-
 	Thread scanner;
 
 	public MISService() {
 		clients = new LinkedList<Client>();
 		stations = new LinkedList<Station>();
 
-		pathToAppData = this.getFilesDir().toString();
-		captureFile = "capture-01.csv";
-		scriptNames = new String[] { "removeCaptureFiles.sh", "startCapture.sh", "stopCapture.sh" };
+		// TEST DATA
+		clients.add(new Client("Seba's Phone", "3C:C2:43:C9:6D:9C"));
+		clients.add(new Client("Fuzzi's Phone", "90:27:E4:32:F2:03"));
+		clients.add(new Client("Random Stanger 1", "00:19:07:07:C5:B0"));
+		clients.add(new Client("Random Stanger 2", "00:1F:CA:CB:6B:E0"));
 
-		Boolean init = false;
-		for (String file : scriptNames) {
-			if (!(new File(pathToAppData + "/" + file).exists())) {
-				init = true;
-			}
-		}
-		if (init) {
-			generateScriptsFromAssets(scriptNames);
-			makeScriptsExecutable(pathToAppData, scriptNames);
-		}
-
-		//scanner = new Thread(new AirTrafficAnalyzer(stations, clients));
+		scanner = new Thread(new AirTrafficAnalyzer(stations, clients));
 
 	}
 
@@ -76,64 +52,6 @@ public class MISService extends Service {
 	@Override
 	public boolean stopService(Intent name) {
 		return super.stopService(name);
-	}
-
-	/**
-	 * @param files
-	 * @return
-	 */
-	private boolean generateScriptsFromAssets(String files[]) {
-		try {
-			for (String file : files) {
-				String data = "";
-				InputStream inputStream = this.getAssets().open(file);
-				InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-				BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-				String receiveString = "";
-				StringBuilder stringBuilder = new StringBuilder();
-
-				while ((receiveString = bufferedReader.readLine()) != null) {
-					stringBuilder.append(receiveString + "\n");
-				}
-
-				inputStream.close();
-				data = stringBuilder.toString();
-
-				OutputStreamWriter outputStreamWriter = new OutputStreamWriter(openFileOutput(file, MODE_PRIVATE));
-				outputStreamWriter.write(data);
-				outputStreamWriter.close();
-			}
-
-		} catch (IOException e) {
-			e.printStackTrace();
-			return false;
-		}
-		return true;
-	}
-
-	/**
-	 * @param path
-	 * @param scriptNames
-	 */
-	private void makeScriptsExecutable(String path, String[] scriptNames) {
-		String abs;
-		for (String file : scriptNames) {
-			abs = path + "/" + file;
-			executer("chmod a+x " + abs);
-		}
-
-	}
-
-	/**
-	 * @param command
-	 */
-	private void executer(String command) {
-		Process p;
-		try {
-			p = Runtime.getRuntime().exec(command);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 	}
 
 	/**

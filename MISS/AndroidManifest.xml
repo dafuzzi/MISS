@@ -29,7 +29,7 @@
             android:name="MISService"
             android:icon="@drawable/ic_launcher"
             android:label="@string/service_name"
-            android:process=":my_process" >
+            android:process=":MISS" >
         </service>
 
         <receiver android:name="BootStarter" >
