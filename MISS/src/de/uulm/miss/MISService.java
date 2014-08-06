@@ -16,7 +16,7 @@ public class MISService extends Service {
 	private LinkedList<Client> clients;
 	private LinkedList<Station> stations;
 
-	Thread scanner;
+	private static Thread scanner;
 
 	public MISService() {
 		clients = new LinkedList<Client>();
@@ -27,7 +27,7 @@ public class MISService extends Service {
 		clients.add(new Client("Fuzzi's Phone", "90:27:E4:32:F2:03"));
 		clients.add(new Client("Random Stanger 1", "00:19:07:07:C5:B0"));
 		clients.add(new Client("Random Stanger 2", "00:1F:CA:CB:6B:E0"));
-
+		
 		scanner = new Thread(new AirTrafficAnalyzer(stations, clients));
 
 	}
