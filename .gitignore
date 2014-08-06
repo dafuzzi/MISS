@@ -63,3 +63,7 @@ proguard/
 .metadata/.plugins/org.eclipse.ui.workbench/dialog_settings.xml
 
 .metadata/.plugins/org.eclipse.ui.workbench/workingsets.xml
+
+.metadata/.plugins/org.eclipse.core.resources/.projects/MISS/.indexes/a0/d6/properties.index
+
+.metadata/.plugins/org.eclipse.core.resources/.projects/MISS/.indexes/a0/de/properties.index

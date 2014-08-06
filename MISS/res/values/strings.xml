@@ -2,7 +2,6 @@
 <resources>
 
     <string name="app_name">MISS: MAC identification and signaling service</string>
-    <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="service_name">MISS</string>
 

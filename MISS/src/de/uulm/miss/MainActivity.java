@@ -12,7 +12,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-
 public class MainActivity extends ActionBarActivity {
 
 	private String pathToAppData;
@@ -38,7 +37,7 @@ public class MainActivity extends ActionBarActivity {
 			generateScriptsFromAssets(scriptNames);
 			makeScriptsExecutable(pathToAppData, scriptNames);
 		}
-
+		
 		startService(new Intent(this, MISService.class));
 	}
 

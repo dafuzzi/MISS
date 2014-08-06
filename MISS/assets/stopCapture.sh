@@ -1,1 +1,2 @@
-killall -9 airodump-ng 2>&1
+killall airodump-ng 2>&1
+exit
