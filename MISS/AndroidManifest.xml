@@ -27,6 +27,7 @@
 
         <service
             android:name="MISService"
+            android:enabled="true"
             android:icon="@drawable/ic_launcher"
             android:label="@string/service_name"
             android:process=":MISS" >

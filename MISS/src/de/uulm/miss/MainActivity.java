@@ -17,6 +17,7 @@ import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ToggleButton;
 import android.widget.*;
+import android.content.*;
 
 public class MainActivity extends ActionBarActivity {
 

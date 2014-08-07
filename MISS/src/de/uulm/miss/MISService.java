@@ -45,9 +45,13 @@ public class MISService extends Service {
 
 	@Override
 	public boolean stopService(Intent name) {
-		Log.d("MISS", "Service stopped");
-		scanner.interrupt();
 		return super.stopService(name);
+	}
+	@Override
+	public void onDestroy() {
+		scanner.interrupt();
+		Log.d("MISS", "Service stopped");
+		super.onDestroy();
 	}
 
 	/**
