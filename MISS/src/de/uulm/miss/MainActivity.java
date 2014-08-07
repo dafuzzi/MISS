@@ -13,6 +13,11 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.ToggleButton;
+import android.widget.*;
+
 public class MainActivity extends ActionBarActivity {
 
 	private String pathToAppData;
@@ -36,8 +41,24 @@ public class MainActivity extends ActionBarActivity {
 			generateScriptsFromAssets(scriptNames);
 			makeScriptsExecutable(pathToAppData, scriptNames);
 		}
+		final MainActivity cxt = this;
 		
-		startService(new Intent(this, MISService.class));
+		ToggleButton scan = (ToggleButton) findViewById(R.id.toggleButton1);
+		final TextView text = (TextView) findViewById(R.id.textView1);
+		
+		scan.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				if (isChecked) {
+					startService(new Intent(cxt, MISService.class));
+					text.setText("service is running");
+				} else {
+					stopService(new Intent(cxt, MISService.class));
+					text.setText("service stopped");
+				}
+			}
+		});
 	}
 
 	@Override

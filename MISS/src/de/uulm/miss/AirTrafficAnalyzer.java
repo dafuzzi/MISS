@@ -23,7 +23,7 @@ public class AirTrafficAnalyzer implements Runnable {
 
 	@Override
 	public void run() {
-		while (true) {
+		while (!(Thread.currentThread().isInterrupted())) {
 			executer("su -c /datadata/de.uulm.miss/files/startCapture.sh");
 
 			try {

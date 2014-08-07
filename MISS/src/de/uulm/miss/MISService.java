@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
-import android.widget.Toast;
+import android.util.Log;
 
 /**
  * @author Fabian Schwab
@@ -31,7 +31,7 @@ public class MISService extends Service {
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		Toast.makeText(this, "Started MISS", Toast.LENGTH_LONG).show();
+		Log.d("MISS", "Service started");
 		if (!scanner.isAlive()) {
 			scanner.start();
 		}
@@ -45,6 +45,8 @@ public class MISService extends Service {
 
 	@Override
 	public boolean stopService(Intent name) {
+		Log.d("MISS", "Service stopped");
+		scanner.interrupt();
 		return super.stopService(name);
 	}
 
@@ -144,6 +146,7 @@ public class MISService extends Service {
 	 */
 	protected void foundClient(Client client) {
 		//TODO intent back to app
+		Log.d("MISS","Found client: "+client.getCustomName());
 	}
 
 	/**
