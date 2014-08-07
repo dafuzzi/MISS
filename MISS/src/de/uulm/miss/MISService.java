@@ -12,10 +12,6 @@ import android.widget.Toast;
  * @author Fabian Schwab
  * 
  */
-/**
- * @author Fuzzi
- * 
- */
 public class MISService extends Service {
 
 	private LinkedList<Client> clients;
