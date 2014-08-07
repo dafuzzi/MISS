@@ -10,12 +10,12 @@ import java.io.OutputStreamWriter;
 import android.support.v7.app.ActionBarActivity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 public class MainActivity extends ActionBarActivity {
 
 	private String pathToAppData;
-	private String captureFile;
 	private String scriptNames[];
 
 	@Override
@@ -24,7 +24,6 @@ public class MainActivity extends ActionBarActivity {
 		setContentView(R.layout.activity_main);
 
 		pathToAppData = this.getFilesDir().toString();
-		captureFile = "capture-01.csv";
 		scriptNames = new String[] { "removeCaptureFiles.sh", "startCapture.sh", "stopCapture.sh" };
 
 		Boolean init = false;
@@ -101,7 +100,7 @@ public class MainActivity extends ActionBarActivity {
 		String abs;
 		for (String file : scriptNames) {
 			abs = path + "/" + file;
-			executer("chmod a+x " + abs);
+			executerWithResponse("chmod a+x " + abs);
 		}
 
 	}
@@ -109,12 +108,21 @@ public class MainActivity extends ActionBarActivity {
 	/**
 	 * @param command
 	 */
-	private void executer(String command) {
+	private void executerWithResponse(String command) {
+		StringBuffer output = new StringBuffer();
 		Process p;
 		try {
 			p = Runtime.getRuntime().exec(command);
+			p.waitFor();
+			BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			String line = "";
+			while ((line = reader.readLine()) != null) {
+				output.append(line + "\n");
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		String response = output.toString();
+		Log.d("MISService Activity", response);
 	}
 }

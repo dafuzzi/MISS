@@ -5,7 +5,6 @@ import java.util.LinkedList;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
-import android.util.Log;
 import android.widget.Toast;
 
 /**
@@ -16,16 +15,14 @@ public class MISService extends Service {
 
 	private LinkedList<Client> clients;
 	private LinkedList<Station> stations;
-	private File appDataPath;
-	private String captureFile;
+	private String appDataPath;
 
 	private static Thread scanner;
 
 	public MISService() {
 		clients = new LinkedList<Client>();
 		stations = new LinkedList<Station>();
-		appDataPath = this.getFilesDir();
-		captureFile = "capture-01.csv";
+		appDataPath = "/datadata/de.uulm.miss/files/capture-01.csv";
 
 		if (scanner == null) {
 			scanner = new Thread(new AirTrafficAnalyzer(this));
@@ -139,7 +136,7 @@ public class MISService extends Service {
 	 * @return
 	 */
 	protected File getPath() {
-		return new File(appDataPath.toString() + "/" + captureFile);
+		return new File(appDataPath);
 	}
 
 	/**
