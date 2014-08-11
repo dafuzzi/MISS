@@ -8,16 +8,16 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
 import android.support.v7.app.ActionBarActivity;
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningServiceInfo;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
-import android.widget.ToggleButton;
 import android.widget.*;
-import android.content.*;
 
 public class MainActivity extends ActionBarActivity {
 
@@ -43,10 +43,18 @@ public class MainActivity extends ActionBarActivity {
 			makeScriptsExecutable(pathToAppData, scriptNames);
 		}
 		final MainActivity cxt = this;
-		
+
 		ToggleButton scan = (ToggleButton) findViewById(R.id.toggleButton1);
 		final TextView text = (TextView) findViewById(R.id.textView1);
-		
+
+		if (isMyServiceRunning(MISService.class)) {
+			scan.setChecked(true);
+			text.setText("service is running");
+		} else {
+			scan.setChecked(false);
+			text.setText("service stopped");
+		}
+
 		scan.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
 			@Override
@@ -146,5 +154,19 @@ public class MainActivity extends ActionBarActivity {
 		}
 		String response = output.toString();
 		Log.d("MISService Activity", response);
+	}
+
+	/**
+	 * @param MISService
+	 * @return
+	 */
+	private boolean isMyServiceRunning(Class<?> MISService) {
+		ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+		for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+			if (MISService.getName().equals(service.service.getClassName())) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

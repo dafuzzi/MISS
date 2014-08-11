@@ -27,10 +27,18 @@ public class MISService extends Service {
 		if (scanner == null) {
 			scanner = new Thread(new AirTrafficAnalyzer(this));
 		}
+		
+		clients.add(new Client("Fabian Phone", "90:27:E4:32:F2:03"));
+		clients.add(new Client("Fabian Mac", "98:FE:94:49:E9:E2"));
+		clients.add(new Client("Seba Phone", "3C:C2:43:C9:6D:9C"));
+		clients.add(new Client("Seba Laptop", "6C:71:D9:50:36:19"));
+		clients.add(new Client("Random MAC", "38:AA:3C:64:20:D6"));
+		
 	}
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
+		
 		Log.d("MISS", "Service started");
 		if (!scanner.isAlive()) {
 			scanner.start();
@@ -49,6 +57,7 @@ public class MISService extends Service {
 	}
 	@Override
 	public void onDestroy() {
+		//TODO geht nicht zu stoppen
 		scanner.interrupt();
 		Log.d("MISS", "Service stopped");
 		super.onDestroy();
