@@ -26,22 +26,25 @@ public class MISService extends Service {
 
 		if (scanner == null) {
 			scanner = new Thread(new AirTrafficAnalyzer(this));
-		}
-		
-		clients.add(new Client("Fabian Phone", "90:27:E4:32:F2:03"));
-		clients.add(new Client("Fabian Mac", "98:FE:94:49:E9:E2"));
-		clients.add(new Client("Seba Phone", "3C:C2:43:C9:6D:9C"));
-		clients.add(new Client("Seba Laptop", "6C:71:D9:50:36:19"));
-		clients.add(new Client("Random MAC", "38:AA:3C:64:20:D6"));
-		
+		}		
 	}
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		
-		Log.d("MISS", "Service started");
 		if (!scanner.isAlive()) {
-			scanner.start();
+			Log.d("MISS", "Service started");
+			//scanner.start();
+		}else{
+			Log.d("MISS", "Service already started");
+		}
+		if(intent.getExtras() != null){
+			Client cl = (Client)intent.getExtras().get("client");
+			if(cl != null){
+				Log.d("MISS","Client " + cl.getCustomName() +" added with MAC: " + cl.getMAC());
+				clients.add(cl);
+			}
+		}else{
+			Log.d("MISS", "no attatched data in intent");
 		}
 		return Service.START_NOT_STICKY;
 	}
