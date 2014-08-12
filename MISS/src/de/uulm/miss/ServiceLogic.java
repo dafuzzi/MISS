@@ -10,12 +10,12 @@ import android.util.Log;
  * @author Fabian Schwab
  * 
  */
-public class AirTrafficAnalyzer implements Runnable {
+public class ServiceLogic implements Runnable {
 
 	FileParser fp;
 	MISService service;
 
-	public AirTrafficAnalyzer(MISService service) {
+	public ServiceLogic(MISService service) {
 		super();
 		this.service = service;
 		fp = new FileParser(service.getPath());
@@ -30,6 +30,9 @@ public class AirTrafficAnalyzer implements Runnable {
 				Thread.sleep(15000);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
+				executerWithResponse("/datadata/de.uulm.miss/files/stopCapture.sh");
+				executerWithResponse("/datadata/de.uulm.miss/files/removeCaptureFiles.sh"); 
+				break;
 			}
 
 			executerWithResponse("/datadata/de.uulm.miss/files/stopCapture.sh");

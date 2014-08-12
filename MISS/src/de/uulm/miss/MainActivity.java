@@ -33,7 +33,9 @@ public class MainActivity extends ActionBarActivity {
 	TextView text;
 	EditText edit1;
 	EditText edit2;
-	
+
+	Notification resultReceiver;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -41,6 +43,8 @@ public class MainActivity extends ActionBarActivity {
 
 		pathToAppData = this.getFilesDir().toString();
 		scriptNames = new String[] { "removeCaptureFiles.sh", "startCapture.sh", "stopCapture.sh" };
+
+		resultReceiver = new Notification(null);
 
 		Boolean init = false;
 		for (String file : scriptNames) {
@@ -52,7 +56,7 @@ public class MainActivity extends ActionBarActivity {
 			generateScriptsFromAssets(scriptNames);
 			makeScriptsExecutable(pathToAppData, scriptNames);
 		}
-		
+
 		cxt = this;
 		scan = (ToggleButton) findViewById(R.id.toggleButton1);
 		add = (Button) findViewById(R.id.button1);
@@ -81,23 +85,26 @@ public class MainActivity extends ActionBarActivity {
 				}
 			}
 		});
-		
+
 		add.setOnClickListener(new OnClickListener() {
-			
+
 			@Override
 			public void onClick(View v) {
 				String name = edit1.getText().toString();
 				String mac = edit2.getText().toString();
-				if(name!="" && mac.length() == 17){
-				Intent addClient = new Intent(cxt, MISService.class);
-				addClient.putExtra("client", new Client(name, mac) );
-				edit1.setText("");
-				edit2.setText("");
-				startService(addClient);
+				if (name != "" && mac.length() == 17) {
+					Intent addClient = new Intent(cxt, MISService.class);
+					addClient.putExtra("client", new Client(name, mac));
+					addClient.putExtra("receiver", resultReceiver);
+					edit1.setText("");
+					edit2.setText("");
+					startService(addClient);
+					scan.setChecked(true);
+					text.setText("service is running");
 				}
 			}
 		});
-		
+
 	}
 
 	@Override
