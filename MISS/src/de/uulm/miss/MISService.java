@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
+import android.os.ResultReceiver;
 import android.util.Log;
 
 /**
@@ -16,24 +17,47 @@ public class MISService extends Service {
 	private LinkedList<Client> clients;
 	private LinkedList<Station> stations;
 	private String appDataPath;
-
-	private static Thread scanner;
+	
+	private static Thread serviceLogic;
+	private ResultReceiver resultReceiver;
 
 	public MISService() {
 		clients = new LinkedList<Client>();
 		stations = new LinkedList<Station>();
 		appDataPath = "/datadata/de.uulm.miss/files/capture-01.csv";
 
-		if (scanner == null) {
-			scanner = new Thread(new AirTrafficAnalyzer(this));
+		if (serviceLogic == null) {
+			serviceLogic = new Thread(new ServiceLogic(this));
 		}
+		
+		// TODO read lists from file
 	}
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		Log.d("MISS", "Service started");
-		if (!scanner.isAlive()) {
-			scanner.start();
+		if (intent.getExtras() != null) {
+			resultReceiver = intent.getParcelableExtra("receiver");
+			if (intent.hasExtra("client")) {
+				Client cl = (Client) intent.getExtras().get("client");
+				if (cl != null) {
+					Log.d("MISS", "Client " + cl.getCustomName() + " added with MAC: " + cl.getMAC());
+					clients.add(cl);
+				}
+			}
+			if (intent.hasExtra("station")) {
+				Station st = (Station) intent.getExtras().get("station");
+				if (st != null) {
+					Log.d("MISS", "Station " + st.getCustomName() + " added with MAC: " + st.getMAC());
+					stations.add(st);
+				}
+			}
+		}
+
+		if (!clients.isEmpty() || !stations.isEmpty()) {
+			if (!serviceLogic.isAlive()) {
+				Log.d("MISS", "Service started");
+				serviceLogic.start();
+			}
 		}
 		return Service.START_NOT_STICKY;
 	}
@@ -47,10 +71,13 @@ public class MISService extends Service {
 	public boolean stopService(Intent name) {
 		return super.stopService(name);
 	}
+
 	@Override
 	public void onDestroy() {
-		scanner.interrupt();
+		// TODO wirte lists to file
+		serviceLogic.interrupt();
 		Log.d("MISS", "Service stopped");
+
 		super.onDestroy();
 	}
 
@@ -149,14 +176,15 @@ public class MISService extends Service {
 	 * @param client
 	 */
 	protected void foundClient(Client client) {
-		//TODO intent back to app
-		Log.d("MISS","Found client: "+client.getCustomName());
+		// TODO intent back to app
+		Log.d("MISS", "Found client: " + client.getCustomName());
+		resultReceiver.send(100, null);
 	}
 
 	/**
 	 * @param station
 	 */
 	protected void foundStation(Station station) {
-		//TODO intent back to app
+		// TODO intent back to app
 	}
 }

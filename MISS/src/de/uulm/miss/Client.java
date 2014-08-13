@@ -1,12 +1,15 @@
 package de.uulm.miss;
 
+import java.io.Serializable;
+
 import org.joda.time.DateTime;
 
 /**
  * @author Fabian Schwab
  *
  */
-public class Client {
+public class Client implements Serializable {
+	private static final long serialVersionUID = 1L;
 	private String customName;
 	private String MAC;
 	private DateTime firstTimeSeen;

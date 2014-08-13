@@ -7,22 +7,34 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
+import android.sax.TextElementListener;
 import android.support.v7.app.ActionBarActivity;
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningServiceInfo;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.CompoundButton;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.CompoundButton.OnCheckedChangeListener;
-import android.widget.ToggleButton;
 import android.widget.*;
-import android.content.*;
 
 public class MainActivity extends ActionBarActivity {
 
 	private String pathToAppData;
 	private String scriptNames[];
+
+	MainActivity cxt;
+	ToggleButton scan;
+	Button add;
+	TextView text;
+	EditText edit1;
+	EditText edit2;
+
+	Notification resultReceiver;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +43,8 @@ public class MainActivity extends ActionBarActivity {
 
 		pathToAppData = this.getFilesDir().toString();
 		scriptNames = new String[] { "removeCaptureFiles.sh", "startCapture.sh", "stopCapture.sh" };
+
+		resultReceiver = new Notification(null);
 
 		Boolean init = false;
 		for (String file : scriptNames) {
@@ -42,11 +56,22 @@ public class MainActivity extends ActionBarActivity {
 			generateScriptsFromAssets(scriptNames);
 			makeScriptsExecutable(pathToAppData, scriptNames);
 		}
-		final MainActivity cxt = this;
-		
-		ToggleButton scan = (ToggleButton) findViewById(R.id.toggleButton1);
-		final TextView text = (TextView) findViewById(R.id.textView1);
-		
+
+		cxt = this;
+		scan = (ToggleButton) findViewById(R.id.toggleButton1);
+		add = (Button) findViewById(R.id.button1);
+		text = (TextView) findViewById(R.id.textView1);
+		edit1 = (EditText) findViewById(R.id.editText1);
+		edit2 = (EditText) findViewById(R.id.editText2);
+
+		if (isMyServiceRunning(MISService.class)) {
+			scan.setChecked(true);
+			text.setText("service is running");
+		} else {
+			scan.setChecked(false);
+			text.setText("service stopped");
+		}
+
 		scan.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
 			@Override
@@ -60,6 +85,26 @@ public class MainActivity extends ActionBarActivity {
 				}
 			}
 		});
+
+		add.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				String name = edit1.getText().toString();
+				String mac = edit2.getText().toString();
+				if (name != "" && mac.length() == 17) {
+					Intent addClient = new Intent(cxt, MISService.class);
+					addClient.putExtra("client", new Client(name, mac));
+					addClient.putExtra("receiver", resultReceiver);
+					edit1.setText("");
+					edit2.setText("");
+					startService(addClient);
+					scan.setChecked(true);
+					text.setText("service is running");
+				}
+			}
+		});
+
 	}
 
 	@Override
@@ -146,5 +191,19 @@ public class MainActivity extends ActionBarActivity {
 		}
 		String response = output.toString();
 		Log.d("MISService Activity", response);
+	}
+
+	/**
+	 * @param MISService
+	 * @return
+	 */
+	private boolean isMyServiceRunning(Class<?> MISService) {
+		ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+		for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+			if (MISService.getName().equals(service.service.getClassName())) {
+				return true;
+			}
+		}
+		return false;
 	}
 }
