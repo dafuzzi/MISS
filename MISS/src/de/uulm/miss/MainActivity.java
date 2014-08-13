@@ -7,7 +7,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
-import android.sax.TextElementListener;
 import android.support.v7.app.ActionBarActivity;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
