@@ -2,10 +2,16 @@ package de.uulm.miss;
 
 import java.io.File;
 import java.util.LinkedList;
+
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.IBinder;
 import android.os.ResultReceiver;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 /**
@@ -39,7 +45,6 @@ public class MISService extends Service {
 			resultReceiver = intent.getParcelableExtra("receiver");
 
 			if (intent.hasExtra("client")) {
-				Log.d("MISS","CLIENT");
 				Client cl = (Client) intent.getExtras().get("client");
 				if (cl != null && intent.getStringExtra("operation").equals("add")) {
 					Log.d("MISS", "Client " + cl.getCustomName() + " added with MAC: " + cl.getMAC());
@@ -49,7 +54,6 @@ public class MISService extends Service {
 					removeClient(cl);
 				}
 			} else if (intent.hasExtra("station")) {
-				Log.d("MISS","STATION");
 				Station st = (Station) intent.getExtras().get("station");
 				if (st != null && intent.getStringExtra("operation").equals("add")) {
 					Log.d("MISS", "Station " + st.getCustomName() + " added with MAC: " + st.getMAC());
@@ -62,12 +66,12 @@ public class MISService extends Service {
 		}
 
 		if (!clients.isEmpty() || !stations.isEmpty()) {
-			Log.d("MISS", "Service started");
+			Log.d("MISS", "Service started. Currently search for " + clients.size() + " client(s).");
 			if (!serviceLogic.isAlive()) {
 				serviceLogic.start();
 			}
-		}else if(clients.isEmpty() && stations.isEmpty()){
-			Log.d("MISS", "Service stopped");
+		} else if (clients.isEmpty() && stations.isEmpty()) {
+			Log.d("MISS", "Service stopped. Currently search for " + clients.size() + " client(s).");
 			if (serviceLogic.isAlive()) {
 				serviceLogic.interrupt();
 			}
@@ -91,7 +95,6 @@ public class MISService extends Service {
 		// TODO wirte lists to file
 		serviceLogic.interrupt();
 		Log.d("MISS", "Service stopped");
-
 		super.onDestroy();
 	}
 
@@ -190,9 +193,28 @@ public class MISService extends Service {
 	 * @param client
 	 */
 	protected void foundClient(Client client) {
-		// TODO intent back to app
 		Log.d("MISS", "Found client: " + client.getCustomName());
+		//TODO more than one resultreceiver
 		resultReceiver.send(100, null);
+
+		//TODO copy in new app
+		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this).setSmallIcon(R.drawable.ic_stat_name).setContentTitle("MISS").setContentText("The requested person " + client.getCustomName() + " has been found!");
+		Intent resultIntent = new Intent(this, MainActivity.class);
+		PendingIntent resultPendingIntent = PendingIntent.getActivity(this, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+		mBuilder.setContentIntent(resultPendingIntent);
+		// Sets an ID for the notification
+		int mNotificationId = 001;
+		
+		//Sound
+		Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+		mBuilder.setSound(alarmSound);
+		
+		// Gets an instance of the NotificationManager service
+		NotificationManager mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+		// Builds the notification and issues it.
+		mNotifyMgr.notify(mNotificationId, mBuilder.build());
+		
+		removeClient(client);
 	}
 
 	/**
