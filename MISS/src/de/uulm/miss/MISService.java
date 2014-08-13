@@ -17,7 +17,7 @@ public class MISService extends Service {
 	private LinkedList<Client> clients;
 	private LinkedList<Station> stations;
 	private String appDataPath;
-	
+
 	private static Thread serviceLogic;
 	private ResultReceiver resultReceiver;
 
@@ -29,7 +29,7 @@ public class MISService extends Service {
 		if (serviceLogic == null) {
 			serviceLogic = new Thread(new ServiceLogic(this));
 		}
-		
+
 		// TODO read lists from file
 	}
 
@@ -37,27 +37,41 @@ public class MISService extends Service {
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		if (intent.getExtras() != null) {
 			resultReceiver = intent.getParcelableExtra("receiver");
+
 			if (intent.hasExtra("client")) {
+				Log.d("MISS","CLIENT");
 				Client cl = (Client) intent.getExtras().get("client");
-				if (cl != null) {
+				if (cl != null && intent.getStringExtra("operation").equals("add")) {
 					Log.d("MISS", "Client " + cl.getCustomName() + " added with MAC: " + cl.getMAC());
-					clients.add(cl);
+					addClient(cl);
+				} else if (cl != null && intent.getStringExtra("operation").equals("remove")) {
+					Log.d("MISS", "Client " + cl.getCustomName() + " removed with MAC: " + cl.getMAC());
+					removeClient(cl);
 				}
-			}
-			if (intent.hasExtra("station")) {
+			} else if (intent.hasExtra("station")) {
+				Log.d("MISS","STATION");
 				Station st = (Station) intent.getExtras().get("station");
-				if (st != null) {
+				if (st != null && intent.getStringExtra("operation").equals("add")) {
 					Log.d("MISS", "Station " + st.getCustomName() + " added with MAC: " + st.getMAC());
-					stations.add(st);
+					addStation(st);
+				} else if (st != null && intent.getStringExtra("operation").equals("remove")) {
+					Log.d("MISS", "Station " + st.getCustomName() + " removed with MAC: " + st.getMAC());
+					removeStation(st);
 				}
 			}
 		}
 
 		if (!clients.isEmpty() || !stations.isEmpty()) {
+			Log.d("MISS", "Service started");
 			if (!serviceLogic.isAlive()) {
-				Log.d("MISS", "Service started");
 				serviceLogic.start();
 			}
+		}else if(clients.isEmpty() && stations.isEmpty()){
+			Log.d("MISS", "Service stopped");
+			if (serviceLogic.isAlive()) {
+				serviceLogic.interrupt();
+			}
+			stopSelf();
 		}
 		return Service.START_NOT_STICKY;
 	}
@@ -140,7 +154,7 @@ public class MISService extends Service {
 	 * @param station
 	 * @return
 	 */
-	private boolean removeSation(Station station) {
+	private boolean removeStation(Station station) {
 		for (Station st : stations) {
 			if (st.getMAC() == station.getMAC()) {
 				return stations.remove(st);

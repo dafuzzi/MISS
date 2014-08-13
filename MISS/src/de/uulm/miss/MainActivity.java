@@ -92,13 +92,14 @@ public class MainActivity extends ActionBarActivity {
 				String mac = edit2.getText().toString();
 				if (name != "" && mac.length() == 17) {
 					Intent addClient = new Intent(getApplicationContext(), MISService.class);
-					addClient.putExtra("client", new Client(name, mac));
+
 					addClient.putExtra("receiver", resultReceiver);
+					addClient.putExtra("operation", "add");
+					addClient.putExtra("client", new Client(name, mac));
 					edit1.setText("");
 					edit2.setText("");
 					startService(addClient);
 					scan.setChecked(true);
-					text.setText("service is running");
 				}
 			}
 		});
