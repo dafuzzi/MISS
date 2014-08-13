@@ -39,20 +39,22 @@ public class MISService extends Service {
 			resultReceiver = intent.getParcelableExtra("receiver");
 
 			if (intent.hasExtra("client")) {
+				Log.d("MISS","CLIENT");
 				Client cl = (Client) intent.getExtras().get("client");
-				if (cl != null && intent.getStringExtra("operation") == "add") {
+				if (cl != null && intent.getStringExtra("operation").equals("add")) {
 					Log.d("MISS", "Client " + cl.getCustomName() + " added with MAC: " + cl.getMAC());
 					addClient(cl);
-				} else if (cl != null && intent.getStringExtra("operation") == "remove") {
+				} else if (cl != null && intent.getStringExtra("operation").equals("remove")) {
 					Log.d("MISS", "Client " + cl.getCustomName() + " removed with MAC: " + cl.getMAC());
 					removeClient(cl);
 				}
 			} else if (intent.hasExtra("station")) {
+				Log.d("MISS","STATION");
 				Station st = (Station) intent.getExtras().get("station");
-				if (st != null && intent.getStringExtra("operation") == "add") {
+				if (st != null && intent.getStringExtra("operation").equals("add")) {
 					Log.d("MISS", "Station " + st.getCustomName() + " added with MAC: " + st.getMAC());
 					addStation(st);
-				} else if (st != null && intent.getStringExtra("operation") == "remove") {
+				} else if (st != null && intent.getStringExtra("operation").equals("remove")) {
 					Log.d("MISS", "Station " + st.getCustomName() + " removed with MAC: " + st.getMAC());
 					removeStation(st);
 				}
@@ -60,10 +62,16 @@ public class MISService extends Service {
 		}
 
 		if (!clients.isEmpty() || !stations.isEmpty()) {
+			Log.d("MISS", "Service started");
 			if (!serviceLogic.isAlive()) {
-				Log.d("MISS", "Service started");
 				serviceLogic.start();
 			}
+		}else if(clients.isEmpty() && stations.isEmpty()){
+			Log.d("MISS", "Service stopped");
+			if (serviceLogic.isAlive()) {
+				serviceLogic.interrupt();
+			}
+			stopSelf();
 		}
 		return Service.START_NOT_STICKY;
 	}
