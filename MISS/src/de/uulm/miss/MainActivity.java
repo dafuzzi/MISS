@@ -27,7 +27,6 @@ public class MainActivity extends ActionBarActivity {
 	private String pathToAppData;
 	private String scriptNames[];
 
-	MainActivity cxt;
 	ToggleButton scan;
 	Button add;
 	TextView text;
@@ -57,7 +56,6 @@ public class MainActivity extends ActionBarActivity {
 			makeScriptsExecutable(pathToAppData, scriptNames);
 		}
 
-		cxt = this;
 		scan = (ToggleButton) findViewById(R.id.toggleButton1);
 		add = (Button) findViewById(R.id.button1);
 		text = (TextView) findViewById(R.id.textView1);
@@ -77,10 +75,10 @@ public class MainActivity extends ActionBarActivity {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 				if (isChecked) {
-					startService(new Intent(cxt, MISService.class));
+					startService(new Intent(getApplicationContext(), MISService.class));
 					text.setText("service is running");
 				} else {
-					stopService(new Intent(cxt, MISService.class));
+					stopService(new Intent(getApplicationContext(), MISService.class));
 					text.setText("service stopped");
 				}
 			}
@@ -93,7 +91,7 @@ public class MainActivity extends ActionBarActivity {
 				String name = edit1.getText().toString();
 				String mac = edit2.getText().toString();
 				if (name != "" && mac.length() == 17) {
-					Intent addClient = new Intent(cxt, MISService.class);
+					Intent addClient = new Intent(getApplicationContext(), MISService.class);
 					addClient.putExtra("client", new Client(name, mac));
 					addClient.putExtra("receiver", resultReceiver);
 					edit1.setText("");
