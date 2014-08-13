@@ -7,7 +7,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
-import android.sax.TextElementListener;
 import android.support.v7.app.ActionBarActivity;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
@@ -64,10 +63,8 @@ public class MainActivity extends ActionBarActivity {
 
 		if (isMyServiceRunning(MISService.class)) {
 			scan.setChecked(true);
-			text.setText("service is running");
 		} else {
 			scan.setChecked(false);
-			text.setText("service stopped");
 		}
 
 		scan.setOnCheckedChangeListener(new OnCheckedChangeListener() {
@@ -75,10 +72,14 @@ public class MainActivity extends ActionBarActivity {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 				if (isChecked) {
-					startService(new Intent(getApplicationContext(), MISService.class));
+					if (!isMyServiceRunning(MISService.class)) {
+						startService(new Intent(getApplicationContext(), MISService.class));
+					}
 					text.setText("service is running");
 				} else {
-					stopService(new Intent(getApplicationContext(), MISService.class));
+					if (isMyServiceRunning(MISService.class)) {
+						stopService(new Intent(getApplicationContext(), MISService.class));
+					}
 					text.setText("service stopped");
 				}
 			}
@@ -91,14 +92,14 @@ public class MainActivity extends ActionBarActivity {
 				String name = edit1.getText().toString();
 				String mac = edit2.getText().toString();
 				if (name != "" && mac.length() == 17) {
-					Intent addClient = new Intent(getApplicationContext(), MISService.class);
+					Intent intent = new Intent(getApplicationContext(), MISService.class);
 
-					addClient.putExtra("receiver", resultReceiver);
-					addClient.putExtra("operation", "add");
-					addClient.putExtra("client", new Client(name, mac));
+					intent.putExtra("receiver", resultReceiver);
+					intent.putExtra("operation", "add");
+					intent.putExtra("client", new Client(name, mac));
 					edit1.setText("");
 					edit2.setText("");
-					startService(addClient);
+					startService(intent);
 					scan.setChecked(true);
 				}
 			}
