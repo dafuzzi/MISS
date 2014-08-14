@@ -2,16 +2,10 @@ package de.uulm.miss;
 
 import java.io.File;
 import java.util.LinkedList;
-
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
-import android.media.RingtoneManager;
-import android.net.Uri;
 import android.os.IBinder;
 import android.os.ResultReceiver;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 /**
@@ -35,8 +29,6 @@ public class MISService extends Service {
 		if (serviceLogic == null) {
 			serviceLogic = new Thread(new ServiceLogic(this));
 		}
-
-		// TODO read lists from file
 	}
 
 	@Override
@@ -66,17 +58,12 @@ public class MISService extends Service {
 		}
 
 		if (!clients.isEmpty() || !stations.isEmpty()) {
-			Log.d("MISS", "Service started. Currently search for " + clients.size() + " client(s).");
+			Log.d("MISS", "Service started. Currently search for " + clients.size() + " device(s).");
 			if (!serviceLogic.isAlive()) {
 				serviceLogic.start();
 			}
-		} else if (clients.isEmpty() && stations.isEmpty()) {
-			Log.d("MISS", "Service stopped. Currently search for " + clients.size() + " client(s).");
-			if (serviceLogic.isAlive()) {
-				serviceLogic.interrupt();
-			}
-			stopSelf();
 		}
+		checkForWork();
 		return Service.START_NOT_STICKY;
 	}
 
@@ -92,40 +79,33 @@ public class MISService extends Service {
 
 	@Override
 	public void onDestroy() {
-		// TODO wirte lists to file
 		serviceLogic.interrupt();
 		Log.d("MISS", "Service stopped");
 		super.onDestroy();
 	}
 
-	/**
-	 * 
-	 */
-	private void readDevicesFromFile() {
-		// TODO Implement: for permanet storage of data
-	}
+	// /**
+	// * @return
+	// */
+	// private boolean activateMonitor() {
+	// return false;
+	// }
+	//
+	// /**
+	// * @return
+	// */
+	// private boolean deaktivateMonitor() {
+	// return false;
+	// }
 
-	/**
-	 * 
-	 */
-	private void saveDevicesToFile() {
-		// TODO Implement: for permanet storage of data
-	}
-
-	/**
-	 * @return
-	 */
-	private boolean activateMonitor() {
-		// TODO implement
-		return false;
-	}
-
-	/**
-	 * @return
-	 */
-	private boolean deaktivateMonitor() {
-		// TODO implement
-		return false;
+	private void checkForWork() {
+		if (clients.isEmpty() && stations.isEmpty()) {
+			Log.d("MISS", "Service stopped. Currently search for " + clients.size() + " client(s).");
+			if (serviceLogic.isAlive()) {
+				serviceLogic.interrupt();
+			}
+			stopSelf();
+		}
 	}
 
 	/**
@@ -150,6 +130,7 @@ public class MISService extends Service {
 				return clients.remove(cl);
 			}
 		}
+		checkForWork();
 		return false;
 	}
 
@@ -163,6 +144,7 @@ public class MISService extends Service {
 				return stations.remove(st);
 			}
 		}
+		checkForWork();
 		return false;
 	}
 
@@ -194,33 +176,14 @@ public class MISService extends Service {
 	 */
 	protected void foundClient(Client client) {
 		Log.d("MISS", "Found client: " + client.getCustomName());
-		//TODO more than one resultreceiver
 		resultReceiver.send(100, null);
-
-		//TODO copy in new app
-		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this).setSmallIcon(R.drawable.ic_stat_name).setContentTitle("MISS").setContentText("The requested person " + client.getCustomName() + " has been found!");
-		Intent resultIntent = new Intent(this, MainActivity.class);
-		PendingIntent resultPendingIntent = PendingIntent.getActivity(this, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-		mBuilder.setContentIntent(resultPendingIntent);
-		// Sets an ID for the notification
-		int mNotificationId = 001;
-		
-		//Sound
-		Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-		mBuilder.setSound(alarmSound);
-		
-		// Gets an instance of the NotificationManager service
-		NotificationManager mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-		// Builds the notification and issues it.
-		mNotifyMgr.notify(mNotificationId, mBuilder.build());
-		
-		removeClient(client);
 	}
 
 	/**
 	 * @param station
 	 */
 	protected void foundStation(Station station) {
-		// TODO intent back to app
+		Log.d("MISS", "Station client: " + station.getCustomName());
+		resultReceiver.send(100, null);
 	}
 }
