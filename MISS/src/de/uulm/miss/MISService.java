@@ -21,6 +21,9 @@ public class MISService extends Service {
 	private static Thread serviceLogic;
 	private ResultReceiver resultReceiver;
 
+	/**
+	 * 
+	 */
 	public MISService() {
 		clients = new LinkedList<Client>();
 		stations = new LinkedList<Station>();
@@ -31,6 +34,7 @@ public class MISService extends Service {
 		}
 	}
 
+	
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		if (intent.getExtras() != null) {
@@ -98,6 +102,9 @@ public class MISService extends Service {
 	// return false;
 	// }
 
+	/**
+	 * 
+	 */
 	private void checkForWork() {
 		if (clients.isEmpty() && stations.isEmpty()) {
 			Log.d("MISS", "Service stopped. Currently search for " + clients.size() + " client(s).");
@@ -116,6 +123,10 @@ public class MISService extends Service {
 		return clients.add(client);
 	}
 
+	/**
+	 * @param station
+	 * @return
+	 */
 	private boolean addStation(Station station) {
 		return stations.add(station);
 	}

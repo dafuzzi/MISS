@@ -15,6 +15,9 @@ public class ServiceLogic implements Runnable {
 	FileParser fp;
 	MISService service;
 
+	/**
+	 * @param service
+	 */
 	public ServiceLogic(MISService service) {
 		super();
 		this.service = service;
