@@ -187,6 +187,7 @@ public class MISService extends Service {
 	 */
 	protected void foundClient(Client client) {
 		Log.d("MISS", "Found client: " + client.getCustomName());
+		//TODO send information back to calling app, so that the app can identify which device was found.
 		resultReceiver.send(100, null);
 	}
 
@@ -195,6 +196,7 @@ public class MISService extends Service {
 	 */
 	protected void foundStation(Station station) {
 		Log.d("MISS", "Station client: " + station.getCustomName());
+		//TODO send information back to calling app, so that the app can identify which device was found.
 		resultReceiver.send(100, null);
 	}
 }
