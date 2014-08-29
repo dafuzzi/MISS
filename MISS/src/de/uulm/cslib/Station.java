@@ -1,4 +1,4 @@
-package de.uulm.miss;
+package de.uulm.cslib;
 
 import java.io.Serializable;
 

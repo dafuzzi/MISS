@@ -7,6 +7,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
+import de.uulm.cslib.Client;
+
 import android.support.v7.app.ActionBarActivity;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;

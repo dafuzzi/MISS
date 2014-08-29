@@ -12,6 +12,10 @@ import java.util.LinkedList;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
+import de.uulm.cslib.Client;
+import de.uulm.cslib.Station;
+
+
 /**
  * @author Fabian Schwab
  *

@@ -2,6 +2,9 @@ package de.uulm.miss;
 
 import java.io.File;
 import java.util.LinkedList;
+
+import de.uulm.cslib.Client;
+import de.uulm.cslib.Station;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
