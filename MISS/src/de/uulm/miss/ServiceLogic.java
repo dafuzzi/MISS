@@ -4,9 +4,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
 import java.util.LinkedList;
-
-import de.uulm.cslib.Client;
-import de.uulm.cslib.Station;
 import android.util.Log;
 
 /**
