@@ -12,7 +12,7 @@ public class BootStarter extends BroadcastReceiver {
 
 	  @Override
 	  public void onReceive(Context context, Intent intent) {
-	    //Intent i = new Intent(context, MISService.class);
+	   // Intent i = new Intent(context, MISService.class);
 	    //context.startService(i);
 	  }
 

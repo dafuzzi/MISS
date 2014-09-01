@@ -20,7 +20,7 @@ public class MISService extends Service {
 
 	private static Thread serviceLogic;
 	private ResultReceiver resultReceiver;
-
+	
 	/**
 	 * 
 	 */
@@ -37,10 +37,11 @@ public class MISService extends Service {
 	
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
+		Log.d("MISS","Service intent received");
 		if (intent.getExtras() != null) {
 			resultReceiver = intent.getParcelableExtra("receiver");
 
-			if (intent.hasExtra("client")) {
+			/*if (intent.hasExtra("client")) {
 				Client cl = (Client) intent.getExtras().get("client");
 				if (cl != null && intent.getStringExtra("operation").equals("add")) {
 					Log.d("MISS", "Client " + cl.getCustomName() + " added with MAC: " + cl.getMAC());
@@ -58,7 +59,12 @@ public class MISService extends Service {
 					Log.d("MISS", "Station " + st.getCustomName() + " removed with MAC: " + st.getMAC());
 					removeStation(st);
 				}
-			}
+			}*/
+			String client_name = intent.getStringExtra("client_name");
+			String client_mac = intent.getStringExtra("client_mac");
+			Log.d("TEST",client_name + " " + client_mac);
+			Client cl = new Client(client_name, client_mac);
+			addClient(cl);
 		}
 
 		if (!clients.isEmpty() || !stations.isEmpty()) {
@@ -72,11 +78,6 @@ public class MISService extends Service {
 	}
 
 	@Override
-	public IBinder onBind(Intent intent) {
-		return null;
-	}
-
-	@Override
 	public boolean stopService(Intent name) {
 		return super.stopService(name);
 	}
@@ -87,7 +88,6 @@ public class MISService extends Service {
 		Log.d("MISS", "Service stopped");
 		super.onDestroy();
 	}
-
 	// /**
 	// * @return
 	// */
@@ -198,5 +198,12 @@ public class MISService extends Service {
 		Log.d("MISS", "Station client: " + station.getCustomName());
 		//TODO send information back to calling app, so that the app can identify which device was found.
 		resultReceiver.send(100, null);
+	}
+
+
+	@Override
+	public IBinder onBind(Intent arg0) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
