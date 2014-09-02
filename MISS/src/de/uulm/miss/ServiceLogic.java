@@ -11,7 +11,9 @@ import android.util.Log;
  * 
  */
 public class ServiceLogic implements Runnable {
-
+	
+	private static final String LOGTAG = "MISS Logic-Thread";
+	
 	FileParser fp;
 	MISService service;
 
@@ -96,6 +98,6 @@ public class ServiceLogic implements Runnable {
 			e.printStackTrace();
 		}
 		String response = output.toString();
-		Log.d("AirTrafficAnalyzer", response);
+		Log.d(LOGTAG, response);
 	}
 }
