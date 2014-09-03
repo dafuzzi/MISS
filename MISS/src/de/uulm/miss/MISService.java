@@ -94,9 +94,6 @@ public class MISService extends Service {
 				break;
 			case MSG_ADD_CLIENT:
 				addDevice(msg.replyTo, MSG_ADD_CLIENT, msg.getData());
-				if (!serviceLogic.isAlive()) {
-					serviceLogic.start();
-				}
 				break;
 			case MSG_REMOVE_CLIENT:
 				removeDevice(msg.replyTo, MSG_REMOVE_CLIENT, msg.getData());

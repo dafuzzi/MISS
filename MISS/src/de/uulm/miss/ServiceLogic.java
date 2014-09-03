@@ -43,11 +43,15 @@ public class ServiceLogic implements Runnable {
 			executerWithResponse("/datadata/de.uulm.miss/files/stopCapture.sh");
 
 			if ((new File("/datadata/de.uulm.miss/files/capture-01.csv").exists())) {
+			
 				LinkedList<Client> findClients = service.getClients();
 				LinkedList<Station> findStations = service.getStations();
 				
 				LinkedList<Client> fc = fp.parseForClients();
 				LinkedList<Station> fs = fp.parseForStations();
+				
+				Log.d(LOGTAG, "Searching for " + findClients.size() + " and found " + fc.size() +" clients");
+				
 				for (Client client : findClients) {
 					for (Client found : fc) {
 						if (client.getMAC().equals(found.getMAC())) {
