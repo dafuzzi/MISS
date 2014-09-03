@@ -32,8 +32,6 @@ public class MainActivity extends ActionBarActivity {
 	EditText edit1;
 	EditText edit2;
 
-	Notification resultReceiver;
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -41,8 +39,6 @@ public class MainActivity extends ActionBarActivity {
 
 		pathToAppData = this.getFilesDir().toString();
 		scriptNames = new String[] { "removeCaptureFiles.sh", "startCapture.sh", "stopCapture.sh" };
-
-		resultReceiver = new Notification(null);
 
 		Boolean init = false;
 		for (String file : scriptNames) {
@@ -94,7 +90,6 @@ public class MainActivity extends ActionBarActivity {
 				if (name != "" && mac.length() == 17) {
 					Intent intent = new Intent(getApplicationContext(), MISService.class);
 
-					intent.putExtra("receiver", resultReceiver);
 					intent.putExtra("operation", "add");
 					intent.putExtra("client", new Client(name, mac));
 					edit1.setText("");
