@@ -8,17 +8,11 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
 import android.support.v7.app.ActionBarActivity;
-import android.app.ActivityManager;
-import android.app.ActivityManager.RunningServiceInfo;
-import android.content.Context;
-import android.content.Intent;
+//import android.app.ActivityManager;
+//import android.app.ActivityManager.RunningServiceInfo;
+//import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.*;
 
 public class MainActivity extends ActionBarActivity {
@@ -50,75 +44,6 @@ public class MainActivity extends ActionBarActivity {
 			generateScriptsFromAssets(scriptNames);
 			makeScriptsExecutable(pathToAppData, scriptNames);
 		}
-
-		scan = (ToggleButton) findViewById(R.id.toggleButton1);
-		add = (Button) findViewById(R.id.button1);
-		text = (TextView) findViewById(R.id.textView1);
-		edit1 = (EditText) findViewById(R.id.editText1);
-		edit2 = (EditText) findViewById(R.id.editText2);
-
-		if (isMyServiceRunning(MISService.class)) {
-			scan.setChecked(true);
-		} else {
-			scan.setChecked(false);
-		}
-
-		scan.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-
-			@Override
-			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				if (isChecked) {
-					if (!isMyServiceRunning(MISService.class)) {
-						startService(new Intent(getApplicationContext(), MISService.class));
-					}
-					text.setText("service is running");
-				} else {
-					if (isMyServiceRunning(MISService.class)) {
-						stopService(new Intent(getApplicationContext(), MISService.class));
-					}
-					text.setText("service stopped");
-				}
-			}
-		});
-
-		add.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				String name = edit1.getText().toString();
-				String mac = edit2.getText().toString();
-				if (name != "" && mac.length() == 17) {
-					Intent intent = new Intent(getApplicationContext(), MISService.class);
-
-					intent.putExtra("operation", "add");
-					intent.putExtra("client", new Client(name, mac));
-					edit1.setText("");
-					edit2.setText("");
-					startService(intent);
-					scan.setChecked(true);
-				}
-			}
-		});
-
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle action bar item clicks here. The action bar will
-		// automatically handle clicks on the Home/Up button, so long
-		// as you specify a parent activity in AndroidManifest.xml.
-		int id = item.getItemId();
-		if (id == R.id.action_settings) {
-			return true;
-		}
-		return super.onOptionsItemSelected(item);
 	}
 
 	/**
@@ -192,13 +117,13 @@ public class MainActivity extends ActionBarActivity {
 	 * @param MISService
 	 * @return
 	 */
-	private boolean isMyServiceRunning(Class<?> MISService) {
-		ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-		for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-			if (MISService.getName().equals(service.service.getClassName())) {
-				return true;
-			}
-		}
-		return false;
-	}
+//	private boolean isMyServiceRunning(Class<?> MISService) {
+//		ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+//		for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+//			if (MISService.getName().equals(service.service.getClassName())) {
+//				return true;
+//			}
+//		}
+//		return false;
+//	}
 }

@@ -2,7 +2,7 @@
 <resources>
 
     <string name="app_name">MISS</string>
-    <string name="action_settings">Settings</string>
     <string name="service_name">MISS</string>
+    <string name="servicename">mac-based identification and signaling service</string>
 
 </resources>
