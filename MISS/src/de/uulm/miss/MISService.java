@@ -31,7 +31,7 @@ public class MISService extends Service {
 	private LinkedList<ScanOrder> boundApplications;
 	private static Thread serviceLogic;
 
-	private final Messenger mMessenger = new Messenger(new IncomingMessageHandler());
+	private final Messenger mMessenger = new Messenger(new IncomingMessageHandler(this));
 
 	private static boolean allowOnRebind = false;
 
@@ -68,22 +68,22 @@ public class MISService extends Service {
 	@Override
 	public void onDestroy() {
 		Log.d(LOGTAG, "onDestroy: Service stopped");
-		if (serviceLogic.isAlive()) {
-			serviceLogic.interrupt();
-		}
+		stopLogicThread();
 		super.onDestroy();
 	}
 
 	/**
-	 * @author Fabian Schwab Handler of incoming messages from applications.
+	 * @author Fabian Schwab
 	 */
 	private class IncomingMessageHandler extends Handler {
-		String mac, name;
+		MISService service;
+		
+		public IncomingMessageHandler(MISService service) {
+			this.service = service;
+		}
 
 		@Override
 		public void handleMessage(Message msg) {
-			mac = null;
-			name = null;
 			Log.d(LOGTAG, "handleMessage: " + msg.what);
 			switch (msg.what) {
 			case MSG_REGISTER_APPLICATION:
@@ -94,6 +94,9 @@ public class MISService extends Service {
 				break;
 			case MSG_ADD_CLIENT:
 				addDevice(msg.replyTo, MSG_ADD_CLIENT, msg.getData());
+				if (!serviceLogic.isAlive()) {
+					serviceLogic.start();
+				}
 				break;
 			case MSG_REMOVE_CLIENT:
 				removeDevice(msg.replyTo, MSG_REMOVE_CLIENT, msg.getData());
@@ -107,73 +110,7 @@ public class MISService extends Service {
 			default:
 				super.handleMessage(msg);
 			}
-			if(getClients().isEmpty() && getStations().isEmpty()){
-				Log.d(LOGTAG, "handleMessage: Thread stopped, no devices.");
-				if (serviceLogic.isAlive()) {
-					serviceLogic.interrupt();
-				}
-			}else{
-				serviceLogic.start();
-			}
-		}
-
-		/**
-		 * @param replyTo
-		 * @param msgType
-		 * @param data
-		 */
-		private void removeDevice(Messenger replyTo, int msgType, Bundle data) {
-			Log.d(LOGTAG, "removeDevice");
-			mac = (String) data.get("MAC");
-			if (mac != null) {
-				for (ScanOrder so : boundApplications) {
-					if (so.getMessenger().equals(replyTo)) {
-						if (msgType == MSG_REMOVE_CLIENT) {
-							for (Client cl : so.getClients()) {
-								if (cl.getMAC().equals(mac)) {
-									so.getClients().remove(cl);
-									break;
-								}
-							}
-						} else if (msgType == MSG_REMOVE_STATION) {
-							for (Station st : so.getStations()) {
-								if (st.getMAC().equals(mac)) {
-									so.getStations().remove(st);
-									break;
-								}
-							}
-						}
-						if (so.getClients().size() == 0 && so.getStations().size() == 0) {
-							removeApplication(replyTo);
-						}
-						return;
-					}
-				}
-			}
-		}
-
-		/**
-		 * @param replyTo
-		 * @param msgType
-		 * @param name
-		 * @param mac
-		 */
-		private void addDevice(Messenger replyTo, int msgType, Bundle data) {
-			Log.d(LOGTAG, "addDevice");
-			mac = (String) data.get("MAC");
-			name = (String) data.get("Name");
-			if (mac != null && name != null) {
-				for (ScanOrder so : boundApplications) {
-					if (so.getMessenger().equals(replyTo)) {
-						if (msgType == MSG_ADD_CLIENT) {
-							so.getClients().add(new Client(name, mac));
-						} else if (msgType == MSG_ADD_STATION) {
-							so.getStations().add(new Station(name, mac));
-						}
-						return;
-					}
-				}
-			}
+			service.check();
 		}
 
 		/**
@@ -201,6 +138,70 @@ public class MISService extends Service {
 				}
 			}
 		}
+
+		/**
+		 * @param replyTo
+		 * @param msgType
+		 * @param name
+		 * @param mac
+		 */
+		private void addDevice(Messenger replyTo, int msgType, Bundle data) {
+			String mac, name;
+			mac = (String) data.get("MAC");
+			name = (String) data.get("Name");
+
+			Log.d(LOGTAG, "addDevice: MAC " + mac + " Name " + name);
+
+			if (mac != null && name != null) {
+				for (ScanOrder so : boundApplications) {
+					if (so.getMessenger().equals(replyTo)) {
+						if (msgType == MSG_ADD_CLIENT) {
+							so.getClients().add(new Client(name, mac));
+						} else if (msgType == MSG_ADD_STATION) {
+							so.getStations().add(new Station(name, mac));
+						}
+						return;
+					}
+				}
+			}
+		}
+
+		/**
+		 * @param replyTo
+		 * @param msgType
+		 * @param data
+		 */
+		private void removeDevice(Messenger replyTo, int msgType, Bundle data) {
+			String mac = (String) data.get("MAC");
+
+			if (mac != null) {
+				for (ScanOrder so : boundApplications) {
+					if (so.getMessenger().equals(replyTo)) {
+						if (msgType == MSG_REMOVE_CLIENT) {
+							for (Client cl : so.getClients()) {
+								if (cl.getMAC().equals(mac)) {
+									so.getClients().remove(cl);
+									Log.d(LOGTAG, "removeDevice: Client MAC " + mac);
+									break;
+								}
+							}
+						} else if (msgType == MSG_REMOVE_STATION) {
+							for (Station st : so.getStations()) {
+								if (st.getMAC().equals(mac)) {
+									so.getStations().remove(st);
+									Log.d(LOGTAG, "removeDevice: Station MAC " + mac);
+									break;
+								}
+							}
+						}
+						if (so.getClients().size() == 0 && so.getStations().size() == 0) {
+							removeApplication(replyTo);
+						}
+						return;
+					}
+				}
+			}
+		}
 	}
 
 	/**
@@ -208,6 +209,18 @@ public class MISService extends Service {
 	 */
 	protected File getPath() {
 		return new File(appDataPath);
+	}
+
+	public void check() {
+		Log.d(LOGTAG,"checking...");
+		if(getClients().size() == 0 && getStations().size() == 0){
+			stopLogicThread();
+			Log.d(LOGTAG,"thread stopped");
+		}
+		if(getClients().size() != 0 || getStations().size() != 0){
+			startLogicThread();
+			Log.d(LOGTAG,"thread started");
+		}
 	}
 
 	/**
@@ -233,6 +246,24 @@ public class MISService extends Service {
 	}
 
 	/**
+	 * 
+	 */
+	protected void startLogicThread() {
+		if (!serviceLogic.isAlive()) {
+			serviceLogic.start();
+		}
+	}
+
+	/**
+	 * 
+	 */
+	protected void stopLogicThread() {
+		if (serviceLogic.isAlive()) {
+			serviceLogic.interrupt();
+		}
+	}
+
+	/**
 	 * @param client
 	 */
 	protected void foundClient(Client client) {
@@ -241,7 +272,8 @@ public class MISService extends Service {
 			for (Client cl : so.getClients()) {
 				if (cl.getMAC().equals(client.getMAC())) {
 					Bundle data = new Bundle();
-					data.putString("Client", cl.getMAC());
+					data.putString("MAC", cl.getMAC());
+					data.putString("Name", cl.getCustomName());
 					sendMessage(so.getMessenger(), data);
 					return;
 				}
