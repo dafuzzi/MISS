@@ -41,10 +41,6 @@ public class MISService extends Service {
 	public MISService() {
 		appDataPath = "/datadata/de.uulm.miss/files/capture-01.csv";
 		boundApplications = new LinkedList<ScanOrder>();
-
-		if (serviceLogic == null) {
-			serviceLogic = new Thread(new ServiceLogic(this));
-		}
 	}
 
 	@Override
@@ -246,6 +242,9 @@ public class MISService extends Service {
 	 * 
 	 */
 	protected void startLogicThread() {
+		if (serviceLogic == null) {
+			serviceLogic = new Thread(new ServiceLogic(this));
+		}
 		if (!serviceLogic.isAlive()) {
 			serviceLogic.start();
 		}
@@ -255,7 +254,7 @@ public class MISService extends Service {
 	 * 
 	 */
 	protected void stopLogicThread() {
-		if (serviceLogic.isAlive()) {
+		if (serviceLogic != null && serviceLogic.isAlive()) {
 			serviceLogic.interrupt();
 		}
 	}
