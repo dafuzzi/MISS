@@ -2,10 +2,15 @@ package de.uulm.miss;
 
 import java.io.File;
 import java.util.LinkedList;
+
 import android.app.Service;
 import android.content.Intent;
+import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
-import android.os.ResultReceiver;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
 import android.util.Log;
 
 /**
@@ -13,166 +18,183 @@ import android.util.Log;
  * 
  */
 public class MISService extends Service {
+	private static final String LOGTAG = "MISS";
+	public static final int MSG_REGISTER_APPLICATION = 1;
+	public static final int MSG_UNREGISTER_APPLICATION = 2;
+	public static final int MSG_ADD_CLIENT = 3;
+	public static final int MSG_ADD_STATION = 4;
+	public static final int MSG_REMOVE_CLIENT = 5;
+	public static final int MSG_REMOVE_STATION = 6;
+	public static final int MSG_FOUND_DEVICE = 7;
 
-	private LinkedList<Client> clients;
-	private LinkedList<Station> stations;
 	private String appDataPath;
-
+	private LinkedList<ScanOrder> boundApplications;
 	private static Thread serviceLogic;
-	private ResultReceiver resultReceiver;
-	
+
+	private final Messenger mMessenger = new Messenger(new IncomingMessageHandler(this));
+
+	private static boolean allowOnRebind = false;
+
 	/**
 	 * 
 	 */
 	public MISService() {
-		clients = new LinkedList<Client>();
-		stations = new LinkedList<Station>();
 		appDataPath = "/datadata/de.uulm.miss/files/capture-01.csv";
-
-		if (serviceLogic == null) {
-			serviceLogic = new Thread(new ServiceLogic(this));
-		}
-	}
-
-	
-	@Override
-	public int onStartCommand(Intent intent, int flags, int startId) {
-		Log.d("MISS","Service intent received");
-		if (intent.getExtras() != null) {
-			resultReceiver = intent.getParcelableExtra("receiver");
-
-			/*if (intent.hasExtra("client")) {
-				Client cl = (Client) intent.getExtras().get("client");
-				if (cl != null && intent.getStringExtra("operation").equals("add")) {
-					Log.d("MISS", "Client " + cl.getCustomName() + " added with MAC: " + cl.getMAC());
-					addClient(cl);
-				} else if (cl != null && intent.getStringExtra("operation").equals("remove")) {
-					Log.d("MISS", "Client " + cl.getCustomName() + " removed with MAC: " + cl.getMAC());
-					removeClient(cl);
-				}
-			} else if (intent.hasExtra("station")) {
-				Station st = (Station) intent.getExtras().get("station");
-				if (st != null && intent.getStringExtra("operation").equals("add")) {
-					Log.d("MISS", "Station " + st.getCustomName() + " added with MAC: " + st.getMAC());
-					addStation(st);
-				} else if (st != null && intent.getStringExtra("operation").equals("remove")) {
-					Log.d("MISS", "Station " + st.getCustomName() + " removed with MAC: " + st.getMAC());
-					removeStation(st);
-				}
-			}*/
-			String client_name = intent.getStringExtra("client_name");
-			String client_mac = intent.getStringExtra("client_mac");
-			Log.d("TEST",client_name + " " + client_mac);
-			Client cl = new Client(client_name, client_mac);
-			addClient(cl);
-		}
-
-		if (!clients.isEmpty() || !stations.isEmpty()) {
-			Log.d("MISS", "Service started. Currently search for " + clients.size() + " device(s).");
-			if (!serviceLogic.isAlive()) {
-				serviceLogic.start();
-			}
-		}
-		checkForWork();
-		return Service.START_NOT_STICKY;
+		boundApplications = new LinkedList<ScanOrder>();
 	}
 
 	@Override
-	public boolean stopService(Intent name) {
-		return super.stopService(name);
+	public void onCreate() {
+		super.onCreate();
+		Log.d(LOGTAG, "onCreate: Service started");
+	}
+
+	@Override
+	public IBinder onBind(Intent intent) {
+		Log.d(LOGTAG, "onBind: Application bound");
+		return mMessenger.getBinder();
+	}
+
+	@Override
+	public boolean onUnbind(Intent intent) {
+		Log.d(LOGTAG, "onUnbind: Application unbound");
+		return allowOnRebind;
 	}
 
 	@Override
 	public void onDestroy() {
-		serviceLogic.interrupt();
-		Log.d("MISS", "Service stopped");
+		Log.d(LOGTAG, "onDestroy: Service stopped");
+		stopLogicThread();
 		super.onDestroy();
 	}
-	// /**
-	// * @return
-	// */
-	// private boolean activateMonitor() {
-	// return false;
-	// }
-	//
-	// /**
-	// * @return
-	// */
-	// private boolean deaktivateMonitor() {
-	// return false;
-	// }
 
 	/**
-	 * 
+	 * @author Fabian Schwab
 	 */
-	private void checkForWork() {
-		if (clients.isEmpty() && stations.isEmpty()) {
-			Log.d("MISS", "Service stopped. Currently search for " + clients.size() + " client(s).");
-			if (serviceLogic.isAlive()) {
-				serviceLogic.interrupt();
-			}
-			stopSelf();
+	private class IncomingMessageHandler extends Handler {
+		MISService service;
+		
+		public IncomingMessageHandler(MISService service) {
+			this.service = service;
 		}
-	}
 
-	/**
-	 * @param client
-	 * @return
-	 */
-	private boolean addClient(Client client) {
-		return clients.add(client);
-	}
-
-	/**
-	 * @param station
-	 * @return
-	 */
-	private boolean addStation(Station station) {
-		return stations.add(station);
-	}
-
-	/**
-	 * @param client
-	 * @return
-	 */
-	private boolean removeClient(Client client) {
-		for (Client cl : clients) {
-			if (cl.getMAC() == client.getMAC()) {
-				return clients.remove(cl);
+		@Override
+		public void handleMessage(Message msg) {
+			Log.d(LOGTAG, "handleMessage: " + msg.what);
+			switch (msg.what) {
+			case MSG_REGISTER_APPLICATION:
+				addApplication(msg.replyTo);
+				break;
+			case MSG_UNREGISTER_APPLICATION:
+				removeApplication(msg.replyTo);
+				break;
+			case MSG_ADD_CLIENT:
+				addDevice(msg.replyTo, MSG_ADD_CLIENT, msg.getData());
+				break;
+			case MSG_REMOVE_CLIENT:
+				removeDevice(msg.replyTo, MSG_REMOVE_CLIENT, msg.getData());
+				break;
+			case MSG_ADD_STATION:
+				addDevice(msg.replyTo, MSG_ADD_STATION, msg.getData());
+				break;
+			case MSG_REMOVE_STATION:
+				removeDevice(msg.replyTo, MSG_REMOVE_STATION, msg.getData());
+				break;
+			default:
+				super.handleMessage(msg);
 			}
+			service.check();
 		}
-		checkForWork();
-		return false;
-	}
 
-	/**
-	 * @param station
-	 * @return
-	 */
-	private boolean removeStation(Station station) {
-		for (Station st : stations) {
-			if (st.getMAC() == station.getMAC()) {
-				return stations.remove(st);
+		/**
+		 * @param replyTo
+		 */
+		private void addApplication(Messenger replyTo) {
+			Log.d(LOGTAG, "addApplication");
+			for (ScanOrder so : boundApplications) {
+				if (so.getMessenger().equals(replyTo)) {
+					return;
+				}
+			}
+			boundApplications.add(new ScanOrder(replyTo));
+		}
+
+		/**
+		 * @param replyTo
+		 */
+		protected void removeApplication(Messenger replyTo) {
+			Log.d(LOGTAG, "removeApplication");
+			for (ScanOrder so : boundApplications) {
+				if (so.getMessenger().equals(replyTo)) {
+					boundApplications.remove(so);
+					return;
+				}
 			}
 		}
-		checkForWork();
-		return false;
-	}
 
-	/**
-	 * @return
-	 */
-	@SuppressWarnings("unchecked")
-	protected LinkedList<Station> getStations() {
-		return (LinkedList<Station>) stations.clone();
-	}
+		/**
+		 * @param replyTo
+		 * @param msgType
+		 * @param name
+		 * @param mac
+		 */
+		private void addDevice(Messenger replyTo, int msgType, Bundle data) {
+			String mac, name;
+			mac = (String) data.get("MAC");
+			name = (String) data.get("Name");
 
-	/**
-	 * @return
-	 */
-	@SuppressWarnings("unchecked")
-	protected LinkedList<Client> getClients() {
-		return (LinkedList<Client>) clients.clone();
+			Log.d(LOGTAG, "addDevice: MAC " + mac + " Name " + name);
+
+			if (mac != null && name != null) {
+				for (ScanOrder so : boundApplications) {
+					if (so.getMessenger().equals(replyTo)) {
+						if (msgType == MSG_ADD_CLIENT) {
+							so.getClients().add(new Client(name, mac));
+						} else if (msgType == MSG_ADD_STATION) {
+							so.getStations().add(new Station(name, mac));
+						}
+						return;
+					}
+				}
+			}
+		}
+
+		/**
+		 * @param replyTo
+		 * @param msgType
+		 * @param data
+		 */
+		private void removeDevice(Messenger replyTo, int msgType, Bundle data) {
+			String mac = (String) data.get("MAC");
+
+			if (mac != null) {
+				for (ScanOrder so : boundApplications) {
+					if (so.getMessenger().equals(replyTo)) {
+						if (msgType == MSG_REMOVE_CLIENT) {
+							for (Client cl : so.getClients()) {
+								if (cl.getMAC().equals(mac)) {
+									so.getClients().remove(cl);
+									Log.d(LOGTAG, "removeDevice: Client MAC " + mac);
+									break;
+								}
+							}
+						} else if (msgType == MSG_REMOVE_STATION) {
+							for (Station st : so.getStations()) {
+								if (st.getMAC().equals(mac)) {
+									so.getStations().remove(st);
+									Log.d(LOGTAG, "removeDevice: Station MAC " + mac);
+									break;
+								}
+							}
+						}
+						if (so.getClients().size() == 0 && so.getStations().size() == 0) {
+							removeApplication(replyTo);
+						}
+						return;
+					}
+				}
+			}
+		}
 	}
 
 	/**
@@ -182,28 +204,116 @@ public class MISService extends Service {
 		return new File(appDataPath);
 	}
 
+	public void check() {
+		Log.d(LOGTAG,"checking...");
+		if(getClients().size() == 0 && getStations().size() == 0){
+			stopLogicThread();
+			Log.d(LOGTAG,"thread stopped");
+		}
+		if(getClients().size() != 0 || getStations().size() != 0){
+			startLogicThread();
+			Log.d(LOGTAG,"thread started");
+		}
+	}
+
+	/**
+	 * @return
+	 */
+	protected LinkedList<Client> getClients() {
+		LinkedList<Client> list = new LinkedList<Client>();
+		for (ScanOrder so : boundApplications) {
+			list.addAll(so.getClients());
+		}
+		return list;
+	}
+
+	/**
+	 * @return
+	 */
+	protected LinkedList<Station> getStations() {
+		LinkedList<Station> list = new LinkedList<Station>();
+		for (ScanOrder so : boundApplications) {
+			list.addAll(so.getStations());
+		}
+		return list;
+	}
+
+	/**
+	 * 
+	 */
+	protected void startLogicThread() {
+		if (serviceLogic == null) {
+			serviceLogic = new Thread(new ServiceLogic(this));
+		}
+		if (!serviceLogic.isAlive()) {
+			serviceLogic.start();
+		}
+	}
+
+	/**
+	 * 
+	 */
+	protected void stopLogicThread() {
+		if (serviceLogic != null && serviceLogic.isAlive()) {
+			serviceLogic.interrupt();
+		}
+	}
+
 	/**
 	 * @param client
 	 */
 	protected void foundClient(Client client) {
-		Log.d("MISS", "Found client: " + client.getCustomName());
-		//TODO send information back to calling app, so that the app can identify which device was found.
-		resultReceiver.send(100, null);
+		Log.d(LOGTAG, "foundClient");
+		for (ScanOrder so : boundApplications) {
+			for (Client cl : so.getClients()) {
+				if (cl.getMAC().equals(client.getMAC())) {
+					Bundle data = new Bundle();
+					data.putString("MAC", cl.getMAC());
+					data.putString("Name", cl.getCustomName());
+					sendMessage(so.getMessenger(), data);
+					return;
+				}
+			}
+		}
 	}
 
 	/**
 	 * @param station
 	 */
 	protected void foundStation(Station station) {
-		Log.d("MISS", "Station client: " + station.getCustomName());
-		//TODO send information back to calling app, so that the app can identify which device was found.
-		resultReceiver.send(100, null);
+		Log.d(LOGTAG, "foundStation");
+		for (ScanOrder so : boundApplications) {
+			for (Station st : so.getStations()) {
+				if (st.getMAC().equals(station.getMAC())) {
+					Bundle data = new Bundle();
+					data.putString("Station", st.getMAC());
+					sendMessage(so.getMessenger(), data);
+					return;
+				}
+			}
+		}
 	}
 
-
-	@Override
-	public IBinder onBind(Intent arg0) {
-		// TODO Auto-generated method stub
-		return null;
+	/**
+	 * @param to
+	 * @param data
+	 */
+	private void sendMessage(Messenger to, Bundle data) {
+		try {
+			Message msg = Message.obtain(null, MSG_FOUND_DEVICE);
+			msg.setData(data);
+			to.send(msg);
+			Log.d(LOGTAG, "sendMessage");
+		} catch (RemoteException e) {
+			// The client is dead. Remove it from the list.
+			Log.d(LOGTAG, "sendMessage: Removed due exception");
+			for (ScanOrder so : boundApplications) {
+				if (so.getMessenger().equals(to)) {
+					boundApplications.remove(so);
+					return;
+				}
+			}
+		}
 	}
+
 }
