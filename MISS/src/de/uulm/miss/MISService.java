@@ -143,8 +143,6 @@ public class MISService extends Service {
 			mac = (String) data.get("MAC");
 			name = (String) data.get("Name");
 
-			Log.d(LOGTAG, "addDevice: MAC " + mac + " Name " + name);
-
 			if (mac != null && name != null) {
 				for (ScanOrder so : boundApplications) {
 					if (so.getMessenger().equals(replyTo)) {
@@ -153,9 +151,12 @@ public class MISService extends Service {
 						} else if (msgType == MSG_ADD_STATION) {
 							so.getStations().add(new Station(name, mac));
 						}
+						Log.d(LOGTAG, "addDevice: MAC " + mac + " Name " + name);
 						return;
 					}
 				}
+				addApplication(replyTo);
+				addDevice( replyTo,  msgType,  data);
 			}
 		}
 
