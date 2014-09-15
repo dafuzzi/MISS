@@ -15,6 +15,12 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.*;
 
+/**
+ * @author Fabian Schwab
+ * 
+ * Every application needs a activity so here are running some initial actions when the service is installed on the deivce.
+ * The scripts for starting, stopping airodump-ng are created in the applications storage. 
+ */
 public class MainActivity extends ActionBarActivity {
 
 	private String pathToAppData;
@@ -47,8 +53,8 @@ public class MainActivity extends ActionBarActivity {
 	}
 
 	/**
-	 * @param files
-	 * @return
+	 * @param files The filename is the same name of an asset file. 
+	 * @return Returns <i>true</i> if the script was successfully generated. 
 	 */
 	private boolean generateScriptsFromAssets(String files[]) {
 		try {
@@ -80,8 +86,10 @@ public class MainActivity extends ActionBarActivity {
 	}
 
 	/**
-	 * @param path
-	 * @param scriptNames
+	 * Runs <i>chmod a+x</i> on the files. 
+	 * 
+	 * @param path Absolute path where the scripts are stored.
+	 * @param scriptNames The name of the scripts
 	 */
 	private void makeScriptsExecutable(String path, String[] scriptNames) {
 		String abs;
@@ -93,7 +101,7 @@ public class MainActivity extends ActionBarActivity {
 	}
 
 	/**
-	 * @param command
+	 * @param command Executes a shell command and returns the result of the command. Block until a result is available. 
 	 */
 	private void executerWithResponse(String command) {
 		StringBuffer output = new StringBuffer();

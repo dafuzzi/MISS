@@ -14,6 +14,8 @@ import org.joda.time.format.DateTimeFormatter;
 
 /**
  * @author Fabian Schwab
+ * 
+ * Parses a text file, generated form airodump-ng and converts the log into client and station objects.
  *
  */
 public class FileParser {
@@ -32,7 +34,7 @@ public class FileParser {
 	private DateTimeFormatter formatter;
 
 	/**
-	 * @param filePath
+	 * @param filePath Absolute location where the airodump-ng log file is located.
 	 */
 	public FileParser(File filePath) {
 		super();
@@ -42,7 +44,7 @@ public class FileParser {
 	}
 
 	/**
-	 * @return
+	 * @return Returns a LinkedList of all found Stations
 	 */
 	public LinkedList<Station> parseForStations() {
 		foundStations = new LinkedList<Station>();
@@ -81,7 +83,7 @@ public class FileParser {
 	}
 
 	/**
-	 * @return
+	 * @return Returns a LinkedList of all found Clients
 	 */
 	public LinkedList<Client> parseForClients() {
 		foundClients = new LinkedList<Client>();

@@ -9,6 +9,10 @@ import android.util.Log;
 /**
  * @author Fabian Schwab
  * 
+ * This contains a thread which is only running when either a client or a station has to be found.
+ * This class also execute some scripts which need superuser permission. 
+ * It starts and stops airodump-ng.  
+ * 
  */
 public class ServiceLogic implements Runnable {
 	
@@ -74,7 +78,7 @@ public class ServiceLogic implements Runnable {
 	}
 
 	/**
-	 * @param command
+	 * @param command Executes a shell command. If a problem occurs this function doesn't give a response. Doesn't block.  
 	 */
 	private void executer(String command) {
 		try {
@@ -85,7 +89,7 @@ public class ServiceLogic implements Runnable {
 	}
 
 	/**
-	 * @param command
+	 * @param command Executes a shell command and returns the result of the command. Block until a result is available. 
 	 */
 	private void executerWithResponse(String command) {
 		StringBuffer output = new StringBuffer();

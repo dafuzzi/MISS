@@ -6,6 +6,8 @@ import org.joda.time.DateTime;
 
 /**
  * @author Fabian Schwab
+ * 
+ * Class which contains all data which can be gathered from airodump-ng.
  *
  */
 public class Client implements Serializable {
@@ -20,8 +22,11 @@ public class Client implements Serializable {
 	private String ESSID;
 
 	/**
-	 * @param customName
-	 * @param MAC
+	 * 
+	 * Returns a new object, instantiated with MAC and customName
+	 * 
+	 * @param customName A user defined name.
+	 * @param MAC The MAC address must have the following format <i>XX:XX:XX:XX:XX:XX</i>. Letters must be upper case. 
 	 */
 	public Client(String customName, String MAC) {
 		this.customName = customName;
@@ -29,14 +34,17 @@ public class Client implements Serializable {
 	}
 
 	/**
-	 * @param customName
-	 * @param MAC
-	 * @param firstTimeSeen
-	 * @param lastTimeSeen
-	 * @param power
-	 * @param packets
-	 * @param bSSID
-	 * @param eSSID
+	 * 
+	 * Returns a new object with all data airodump-ng provides.
+	 * 
+	 * @param customName A user defined name.
+	 * @param MAC The MAC address must have the following format <i>XX:XX:XX:XX:XX:XX</i>. Letters must be upper case.
+	 * @param firstTimeSeen When the client was detected for the first time.
+	 * @param lastTimeSeen When the client was detected for the last time.
+	 * @param power Signal strength in decibel.
+	 * @param packets Number of received packets.
+	 * @param bSSID SSID the client is connected to.
+	 * @param eSSID Probed SSID which are known by the client himself.
 	 */
 	public Client(String customName, String MAC, DateTime firstTimeSeen, DateTime lastTimeSeen, int power, int packets, String bSSID, String eSSID) {
 		this.customName = customName;
@@ -47,6 +55,7 @@ public class Client implements Serializable {
 		this.packets = packets;
 		BSSID = bSSID;
 		ESSID = eSSID;
+		 
 	}
 	
 	/**
@@ -64,35 +73,35 @@ public class Client implements Serializable {
 	}
 
 	/**
-	 * @return
+	 * @return 
 	 */
 	public String getMAC() {
 		return MAC;
 	}
 
 	/**
-	 * @param MAC
+	 * @param MAC 
 	 */
 	public void setMAC(String MAC) {
 		this.MAC = MAC;
 	}
 
 	/**
-	 * @return
+	 * @return 
 	 */
 	public DateTime getFirstTimeSeen() {
 		return firstTimeSeen;
 	}
 
 	/**
-	 * @param firstTimeSeen
+	 * @param firstTimeSeen 
 	 */
 	public void setFirstTimeSeen(DateTime firstTimeSeen) {
 		this.firstTimeSeen = firstTimeSeen;
 	}
 
 	/**
-	 * @return
+	 * @return 
 	 */
 	public DateTime getLastTimeSeen() {
 		return lastTimeSeen;

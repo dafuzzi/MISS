@@ -16,6 +16,9 @@ import android.util.Log;
 /**
  * @author Fabian Schwab
  * 
+ * This service needs active monitor mode on the wireless module. 
+ * It also runs airodump-ng to scan for other wireless devices in range. 
+ * 
  */
 public class MISService extends Service {
 	private static final String LOGTAG = "MISS";
@@ -36,7 +39,7 @@ public class MISService extends Service {
 	private static boolean allowOnRebind = false;
 
 	/**
-	 * 
+	 * This creates a new bound service. The absolute path for the airodump-ng file is set here. 
 	 */
 	public MISService() {
 		appDataPath = "/datadata/de.uulm.miss/files/capture-01.csv";
@@ -70,6 +73,17 @@ public class MISService extends Service {
 
 	/**
 	 * @author Fabian Schwab
+	 * 
+	 * Handles messages send form a application to this service. 
+	 * The allowed 'what' constants in the message objects are
+	 * <ul>
+	 * <li>MSG_REGISTER_APPLICATION</li>
+	 * <li>MSG_UNREGISTER_APPLICATION</li>
+	 * <li>MSG_ADD_CLIENT</li>
+	 * <li>MSG_REMOVE_CLIENT</li>
+	 * <li>MSG_ADD_STATION</li>
+	 * <li>MSG_REMOVE_STATION</li>
+	 * </ul>
 	 */
 	private class IncomingMessageHandler extends Handler {
 		MISService service;
@@ -107,6 +121,8 @@ public class MISService extends Service {
 		}
 
 		/**
+		 * Adds a application when it is bound to the service to add scan jobs later. 
+		 * 
 		 * @param replyTo
 		 */
 		private void addApplication(Messenger replyTo) {
@@ -120,6 +136,8 @@ public class MISService extends Service {
 		}
 
 		/**
+		 * Removes a application and all scan jobs linked with this application. 
+		 * 
 		 * @param replyTo
 		 */
 		protected void removeApplication(Messenger replyTo) {
@@ -133,6 +151,8 @@ public class MISService extends Service {
 		}
 
 		/**
+		 * Adds a application and adds the device which the application is looking for. 
+		 * 
 		 * @param replyTo
 		 * @param msgType
 		 * @param name
@@ -161,6 +181,9 @@ public class MISService extends Service {
 		}
 
 		/**
+		 * 
+		 * Removes a device and the application when the are no linked scanjobs
+		 * 
 		 * @param replyTo
 		 * @param msgType
 		 * @param data
@@ -199,13 +222,16 @@ public class MISService extends Service {
 	}
 
 	/**
-	 * @return
+	 * @return Returns the absolute path including the filename of the log file which is created by airodump-ng.
 	 */
 	protected File getPath() {
 		return new File(appDataPath);
 	}
 
-	public void check() {
+	/**
+	 * Checks if there is any device which has to be found and start or stops the thread.
+	 */
+	protected void check() {
 		Log.d(LOGTAG,"checking...");
 		if(getClients().size() == 0 && getStations().size() == 0){
 			stopLogicThread();
@@ -240,7 +266,7 @@ public class MISService extends Service {
 	}
 
 	/**
-	 * 
+	 * Starts the thread which is scanning for devices.
 	 */
 	protected void startLogicThread() {
 		if (serviceLogic == null) {
@@ -252,7 +278,7 @@ public class MISService extends Service {
 	}
 
 	/**
-	 * 
+	 * Stops the thread which is scanning for devices. 
 	 */
 	protected void stopLogicThread() {
 		if (serviceLogic != null && serviceLogic.isAlive()) {
@@ -261,6 +287,8 @@ public class MISService extends Service {
 	}
 
 	/**
+	 * Called form the logic thread when a client is found.
+	 * 
 	 * @param client
 	 */
 	protected void foundClient(Client client) {
@@ -279,6 +307,8 @@ public class MISService extends Service {
 	}
 
 	/**
+	 * Called form the logic thread when a station is found.
+	 * 
 	 * @param station
 	 */
 	protected void foundStation(Station station) {
@@ -296,8 +326,10 @@ public class MISService extends Service {
 	}
 
 	/**
-	 * @param to
-	 * @param data
+	 * If an device is found this is called and sends a new message contains device informations the target application. 
+	 * 
+	 * @param to The target application
+	 * @param data The data bundle which contains the device information. 
 	 */
 	private void sendMessage(Messenger to, Bundle data) {
 		try {

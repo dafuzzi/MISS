@@ -6,6 +6,8 @@ import org.joda.time.DateTime;
 
 /**
  * @author Fabian Schwab
+ * 
+ * Class which contains all data which can be gathered from airodump-ng.
  *
  */
 public class Station implements Serializable {
@@ -27,29 +29,32 @@ public class Station implements Serializable {
 	private String ESSID;
 	
 	/**
-	 * @param customName
-	 * @param MAC
+	 * 
+	 * Returns a new object, instantiated with MAC and customName
+	 * 
+	 * @param customName A user defined name.
+	 * @param MAC The MAC address must have the following format <i>XX:XX:XX:XX:XX:XX</i>. Letters must be upper case. 
 	 */
 	public Station(String customName, String MAC){
 		this.customName = customName;
 		this.MAC = MAC;
 	}
 	/**
-	 * @param customName
-	 * @param MAC
-	 * @param firstTimeSeen
-	 * @param lastTimeSeen
-	 * @param channel
-	 * @param speed
-	 * @param privacy
-	 * @param authentication
-	 * @param cipher
-	 * @param power
-	 * @param beacons
-	 * @param iv
-	 * @param ip
-	 * @param idLength
-	 * @param eSSID
+	 * @param customName A user defined name.
+	 * @param MAC The MAC address must have the following format <i>XX:XX:XX:XX:XX:XX</i>. Letters must be upper case.
+	 * @param firstTimeSeen When the client was detected for the first time.
+	 * @param lastTimeSeen When the client was detected for the last time.
+	 * @param channel The channel on which the station is sending.
+	 * @param speed The supported speed rates. 
+	 * @param privacy The supported encryptions.
+	 * @param authentication The supported authentications.
+	 * @param cipher The supported encryptions.
+	 * @param power The signal strength.
+	 * @param beacons Number of received beacons. 
+	 * @param iv Number of known initial vectors. 
+	 * @param ip The IP the station owns. 
+	 * @param idLength Length of the stations ID.
+	 * @param eSSID Name of the stations SSID.
 	 */
 	public Station(String customName, String MAC, DateTime firstTimeSeen, DateTime lastTimeSeen,
 			int channel, int speed, String privacy, String authentication,
