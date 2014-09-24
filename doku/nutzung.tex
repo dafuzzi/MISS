@@ -21,14 +21,20 @@ Sobald sich eines der gesuchten Geräte in der Nähe befindet und erkannt wird, 
 \chapter{Grundlagen}
 Um die Funktionsweise des Service genauer verstehen zu können, sollten zunächst einige Grundlagen erklärt werden. In diesem Abschnitt werden die vom Service genutzten Technologien kurz beschrieben. Da dies keine vollständige Beschreibung darstellt, sollten die Technologien in ihren Grundzügen bekannt sein. 
 \section{Kabellose Kommunikation}
-Die Anzahl der Geräte die mithilfe von WLAN kommunizieren nehmen ständig zu. Bei einem Großteil dieser Geräte wird das \textit{WNIC}, manchmal trotz limitierter Ressourcen, nicht abgeschaltet. Trotz verschlüsselter Verbindungen werden definiert durch den \textit{IEEE 802.11} Standard einige Daten in Klartext übertragen. Diese Daten werden von MISS genutzt um Geräte in der Nähe zu erkennen und bekannte zu identifizieren. \\
+Die Anzahl der Geräte die mithilfe von WLAN kommunizieren nehmen ständig zu. Bei einem Großteil dieser Geräte wird das \textit{WNIC}\footnote{Wireless Network Interface Controller}, manchmal trotz limitierter Ressourcen, nicht abgeschaltet. Trotz verschlüsselter Verbindungen werden definiert durch den \textit{IEEE 802.11} Standard einige Daten in Klartext übertragen. Diese Daten werden von MISS genutzt um Geräte in der Nähe zu erkennen und bekannte zu identifizieren. \\
 Durch den \textit{IEEE 802.11} Standard werden auf der Sicherungsschicht des \textit{OSI-Modell} Datagramme, sogenannte \textit{Frames} definiert welche in spezielle Teile unterteilt sind. Jeder \textit{Frame} enthält ein \textit{MAC header} Feld, in dem die Absender MAC-Adresse im Klartext dargestellt ist. Durch belauschen der umliegenden Kommunikation kann so nach einer bestimmten MAC-Adresse gesucht werden. \\
 Aber nicht nur Geräte die im Moment Daten austauschen können erkannt werden, sonder auch Geräte die inaktiv sind. Jedes WLAN fähige Gerät senden abhängig von der Implementierung des \textit{WNIC} Treibers periodische Pakete aus. Diese Pakete gehören zu der Gruppe der \textit{Managementframes}. \\
-Bei den \textit{probe request frames} handelt es sich um Pakete die von \textit{Clients} gesendet werden um Informationen über Netzwerke zu sammeln. Durch die Angabe einer \textit{SSID} kann im Kommunikationsbereich des Gerätes nach bestimmten Netzwerken gesucht werden oder durch Angabe der \textit{boradcast SSID} kann nach allen Netzwerken gesucht werden die dieses Paket empfangen und darauf Antworten. Diese Pakete werden periodisch versendet egal ob das Gerät bereits mit einem Netzwerk verbunden ist oder nicht.\\
+Bei den \textit{probe request frames} handelt es sich um Pakete die von \textit{Clients} gesendet werden um Informationen über Netzwerke zu sammeln. Durch die Angabe einer \textit{SSID}\footnote{Service Set Identifier} kann im Kommunikationsbereich des Gerätes nach bestimmten Netzwerken gesucht werden oder durch Angabe der \textit{boradcast SSID} kann nach allen Netzwerken gesucht werden die dieses Paket empfangen und darauf Antworten. Diese Pakete werden periodisch versendet egal ob das Gerät bereits mit einem Netzwerk verbunden ist oder nicht.\\
 \textit{Stations} senden sogenannte \textit{beacon frames} aus. Damit geben sie periodisch ihre Präsenz, \textit{SSID} und andere Parameter bekannt. \\
-Im Standard Betriebsmodus eines \textit{WNIC} ist es nicht vorgesehen, dass Pakete, die an andere MAC-Adressen gerichtet sind an höhere Schichten weitergeleitet werden. Diese Pakete werden bereits auf der zweiten Schicht dem \textit{Data Link Layer} verworfen. Damit aber auch diese Pakete weitergeleitet werden, ist es notwendig den Betriebsmodus des \textit{WNIC} auf den sogenannten \textit{Monitormode} zu setzten. Dieser Mode wird über den Treiber des \textit{WNIC} eingestellt um muss dort auch implementiert sein. 
+Im Standard Betriebsmodus eines \textit{WNIC} ist es nicht vorgesehen, dass Pakete, die an andere MAC-Adressen gerichtet sind an höhere Schichten weitergeleitet werden. Diese Pakete werden bereits auf der zweiten Schicht dem \textit{Data Link Layer} verworfen. Damit aber auch diese Pakete weitergeleitet werden, ist es notwendig den Betriebsmodus des \textit{WNIC} auf den sogenannten \textit{Monitor Mode} zu setzten. Dieser Mode wird über den Treiber des \textit{WNIC} eingestellt um muss dort auch implementiert sein. 
 \subsection{Airodump-ng}\label{airodump-ng}
-\textit{Airodump-ng} ist ein Kommandozeilenprogramm welches für das erfassen von \textit{IEEE 802.11 frames} genutzt wird. Mit diesem Programm lassen sich Log-Dateien erstellen welche Informationen über alle erfassten \textit{Stations} und \textit{Clients} enthalten. Eine Auszug von solch einer Log-Datei ist in Abbildung TODO zusehen. Die nachfolgenden Auflistungen beschreiben stichpunktartig die erfassbaren Daten für \textit{Stations} und \textit{Clients}.\\ \\
+\textit{Airodump-ng}\footnote{http://www.aircrack-ng.org/doku.php?id=airodump-ng} ist ein Kommandozeilenprogramm welches für das erfassen von \textit{IEEE 802.11 frames} genutzt wird und ein Teil der \textit{Aircrack-ng suit}\footnote{http://www.aircrack-ng.org} ist. Mit diesem Programm lassen sich Log-Dateien erstellen welche Informationen über alle erfassten \textit{Stations} und \textit{Clients} enthalten. Eine Auszug von solch einer Log-Datei ist in Abbildung \ref{fig:log_file} zusehen. Die nachfolgenden Auflistungen beschreiben stichpunktartig die erfassbaren Daten für \textit{Stations} und \textit{Clients}.\\ \\
+\begin{figure}
+    \centering
+    \includegraphics[width=5.0in]{bilder/log.png}
+    \caption{Mit airodump-ng erstellte Log-Datei}
+    \label{fig:log_file}
+\end{figure}
 \begin{tabular}{l | l}
 \toprule
 Erfassbare \textit{Station} Daten & Beschreibung \\
@@ -73,14 +79,39 @@ Aktuell gibt es kein Android Gerät welches einen \textit{WNIC} besitzt, für de
 \item Asus Nexus 7 mit Cyanogen 7
 \end{itemize}
 \subsection{Cyanogen}
-Alle zuvor ausgelisteten Geräte nutzen Cyanogen. Cyanogen ist eine erweiterte \textit{open source} Firmware Distribution für Smartphones und Tablets welche auf den Android Betriebssystem basiert. Diese bietet Eigenschaften und Erweiterungen die es in der offiziellen oder in der des Herstellers ausgelieferten Firmware nicht gibt. \\
+Alle zuvor ausgelisteten Geräte nutzen Cyanogen\footnote{http://www.cyanogenmod.org}. Cyanogen ist eine erweiterte \textit{open source} Firmware Distribution für Smartphones und Tablets welche auf den Android Betriebssystem basiert. Diese bietet Eigenschaften und Erweiterungen die es in der offiziellen oder in der des Herstellers ausgelieferten Firmware nicht gibt. \\
 Um Cyanogen auf einem Unterstützten Gerät zu installieren, muss es zuvor \textit{gerootet} werden. Diese bedeutet, das man alle Rechte erlangt was normalerweise auch aus Sicherheitsgründen so nicht vorgesehen ist. 
 \subsection{bcmon.apk}
-Nachdem das Gerät gerootet wurde und Cyanogen installiert wurde. Wird das kleine Programm bcmon installiert. Mithilfe dieses Programms, welches die neue Firmware für den \textit{WNIC} enthält, kann der \textit{Monitor Mode} aktiviert werden. Anschließend ist das Gerät für die Verwendung des MISS Hintergrunddienstes vorbeireitet. 
+Nachdem das Gerät \textit{gerootet} wurde und Cyanogen installiert wurde. Wird das kleine Programm \textit{bcmon}\footnote{http://bcmon.blogspot.de} installiert. Mithilfe dieses Programms, welches die neue Firmware für den \textit{WNIC} enthält, kann der \textit{Monitor Mode} aktiviert werden. Anschließend ist das Gerät für die Verwendung des MISS Hintergrunddienstes vorbeireitet. 
 \chapter{Architektur und Implementierung}
+In diesem Kapitel wird zunächst die grundlegende Architektur des verwendeten Dienstes erläutert und anschließend auf die Implementierung eingegangen. Dieses und nachfolgende Kapitel setzten voraus, dass Grundlagen der Programmierung in Java und Android bekannt sind. Sind diese nicht bekan  nt, wird an dieser Stelle auf die Android-Entwicklerseite\footnote{http://developer.android.com} verwiesen. 
 \section{Architektur}
+\subsection{Android IntentService}
+Ein Service ist eine im Hintergrund laufende Komponente welche keine direkte Interaktion mit einem Nutzer besitzt. Da ein Service kein Benutzeroberfläche benötigt, ist ein dieser auch nicht an den Lebenszyklus einer \textit{activity} gebunden. Im Allgemeinen werden Services genutzt um wiederkehrende und potentiell lange andauernde Aufgaben zu erledigen wie Beispielsweise das herunterladen von Inhalten aus dem Internet oder das aktualisieren von Daten. Ebenfalls werden Services mit einer höheren Priorität als sich im Hintergrund befindlichen Anwendungen ausgeführt und daher ist es unwahrscheinlicher, dass sie vom Betriebssystem abgeschaltet werden. \\
+Zusätzlich können Services unter Android so Konfiguriert werden, dass sie neu gestartet werden sollte das Betriebssystem sie beenden. \\
+Da der in diesem Projekt genutzte Service nicht immer aktiv sein soll, wird hier auf eine besondere Art eines Service zurückgegriffen. Bei dieser Art von Hintergrunddienst handelt es sich um einen in \textit{intentService} welcher von der Klasse \textit{Service} erbt. Der Lebenszyklus eines \textit{intentService} ist in Abbildung \ref{fig:lifetime} abgebildet. Hierbei wird ersichtlich, dass diese Art von Service nicht immer im Hintergrund aktiv ist. Nur wenn ein Client an der Service gebunden ist wird, ist dieser aktiv. Im Gegensatz zu seiner Basisklasse, wobei ein Aufruf von \textit{stopService()} genügt um diesen zu beenden, wird ein \textit{intentService} erst beendet, wenn sich alle Clients entbunden haben.
+\begin{figure}
+    \centering 
+    \includegraphics[width=3.0in]{bilder/intentservice.png}
+    \caption{Lebenszyklus eines \textit{intentService}}
+    \label{fig:lifetime}
+\end{figure}
+\subsection{Service Logik}
+Der Aufbau des Service wie er Implementiert werden soll ist in Abbildung \ref{fig:uml} ersichtlich. Bindet sich eine Anwendung am Service wird dieser, falls er noch nicht aktiv ist, gestartet. Der Service verfügt über einen eigenen Thread, welcher die eigentliche Arbeit übernimmt. Dies ermöglicht ein sofortiges abarbeiten weiterer Anfragen von bereits gebundenen Anwendungen oder wenn sich weitere Anwendungen an den Service binden möchten. \\
+Aus Effizienzgründen wird der Thread nur gestartet wenn Geräte gesucht werden. Diese werden zu suchenden Geräte werden an den Service übermittelt, der daraufhin den Thread nach bedarf startet oder stoppt. \\
+Die Aufgabe des Threads ist es alle Geräte in der Nähe zu erfassen. Dabei sollen alle zu erfassenden Daten, wie in Abschnitt \ref{airodump-ng} gezeigt, erfasst werden. Anschließend werden die gefunden Geräte mit den gesuchten Verglichen. Befindet sich ein gesuchtes unter den gefunden so benachrichtigt der Thread den Service. Der Service benachrichtigt die entsprechende Anwendung über den Fund des angefragten Gerätes. \\ 
+Je nach Implementierung der Zielanwendung entscheidet diese über das weitere vorgehen. In der Regel wird davon ausgegangen das die Anwendung eine Aktion auslöst und das gesuchte Gerät nicht mehr benötigt wird und es dem Service mitteilt.  
+Durch eine Nachricht an den Service wird das zuvor gescuhte Gerät entfernt.\\
+\begin{figure}
+    \centering 
+    \includegraphics[width=5.0in]{bilder/uml.png}
+    \caption{Anwendungsfall und Lebenszyklus des MISS als UML-Sequenzdiagramm.}
+    \label{fig:uml}
+\end{figure}
+Der Service überprüft bei jedem Empfang einer Nachricht ob der Arbeiter-Thread gestartet werden muss oder nicht. Das entscheiden Kriterium ist, ob sich gesuchte Geräte im Service befinden. Antwortet eine Anwendung auf den Fund eines seiner Gesuchten Geräte nicht, wird davon ausgegangen das die Anwendung unerwartet beendet wurde. Der Service entfernt die Anwendung und all ihrer Geräte welche im Zusammenhang mit ihr stehen.\\
+Befinden sich keine gesuchten Geräte im Dienst, beendet dieser den Arbeiter-Thread. Haben sich alle Anwendungen ordnungsgemäß vom Service abgemeldet oder wurden durch eine ausbleibende Antwort entfernt, beendet sich der Service selbst da er nicht mehr benötigt wird.
 \section{Implementierung}
-Für die Implementierung der voran gezeigten Architektur wurde das Eclipse ADT verwendet. Als Zielgerät wurde das Samsung Galaxy GS1 mit Cyanogen 7 gewählt. Hierbei war zu beachten, das bei der Programmierung nur Eigenschaften bis API Level 10 zu Nutzen sind. Die liegt an der geringen Android Version 2.3.3 welche dem Cyanogen 7 Mod zu grunde liegt. \\
+Für die Implementierung der voran gezeigten Architektur wurde das Eclipse ADT\footnote{http://developer.android.com/sdk/index.html} verwendet. Als Zielgerät wurde das Samsung Galaxy GS1 mit Cyanogen 7 gewählt. Hierbei war zu beachten, das bei der Programmierung nur Eigenschaften bis API Level 10 zu Nutzen sind. Die liegt an der geringen Android Version 2.3.3 welche dem Cyanogen 7 Mod zu grunde liegt. \\
 \subsubsection{Anwendungsprogramm PAR}
 
 \chapter{Benutzung}
