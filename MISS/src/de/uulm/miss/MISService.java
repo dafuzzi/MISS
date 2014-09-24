@@ -270,7 +270,7 @@ public class MISService extends Service {
 	 */
 	protected void startLogicThread() {
 		if (serviceLogic == null) {
-			serviceLogic = new Thread(new ServiceLogic(this));
+			serviceLogic = new Thread(new ScanLogic(this));
 		}
 		if (!serviceLogic.isAlive()) {
 			serviceLogic.start();

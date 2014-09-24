@@ -14,7 +14,7 @@ import android.util.Log;
  * It starts and stops airodump-ng.  
  * 
  */
-public class ServiceLogic implements Runnable {
+public class ScanLogic implements Runnable {
 	
 	private static final String LOGTAG = "MISS Logic-Thread";
 	
@@ -24,7 +24,7 @@ public class ServiceLogic implements Runnable {
 	/**
 	 * @param service
 	 */
-	public ServiceLogic(MISService service) {
+	public ScanLogic(MISService service) {
 		super();
 		this.service = service;
 		fp = new FileParser(service.getPath());
