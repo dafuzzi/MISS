@@ -10,8 +10,8 @@
           showstringspaces=false,
           frame=single,
           numbers=left,
-          basicstyle=\ttfamily,
-          numberstyle=\tiny
+          basicstyle=\ttfamily\scriptsize,
+          numberstyle=\tiny,
         }
 % Title Page
 \title{MISS \\ Mac-based Identification and Signaling Service}
@@ -96,14 +96,17 @@ Nachdem das Gerät \textit{gerootet} wurde und Cyanogen installiert wurde. Wird 
 \chapter{Architektur und Implementierung}
 In diesem Kapitel wird zunächst die grundlegende Architektur des verwendeten Dienstes erläutert und anschließend auf die Implementierung eingegangen. Dieses und nachfolgende Kapitel setzten voraus, dass Grundlagen der Programmierung in Java und Android bekannt sind. Sind diese nicht bekan  nt, wird an dieser Stelle auf die Android-Entwicklerseite\footnote{http://developer.android.com} verwiesen. 
 \section{Architektur}
-\subsection{Android IntentService}
+\subsection{Android Bound Service}
 Ein Service ist eine im Hintergrund laufende Komponente welche keine direkte Interaktion mit einem Nutzer besitzt. Da ein Service kein Benutzeroberfläche benötigt, ist ein dieser auch nicht an den Lebenszyklus einer \textit{activity} gebunden. Im Allgemeinen werden Services genutzt um wiederkehrende und potentiell lange andauernde Aufgaben zu erledigen wie Beispielsweise das herunterladen von Inhalten aus dem Internet oder das aktualisieren von Daten. Ebenfalls werden Services mit einer höheren Priorität als sich im Hintergrund befindlichen Anwendungen ausgeführt und daher ist es unwahrscheinlicher, dass sie vom Betriebssystem abgeschaltet werden. \\
 Zusätzlich können Services unter Android so Konfiguriert werden, dass sie neu gestartet werden sollte das Betriebssystem sie beenden. \\
-Da der in diesem Projekt genutzte Service nicht immer aktiv sein soll, wird hier auf eine besondere Art eines Service zurückgegriffen. Bei dieser Art von Hintergrunddienst handelt es sich um einen in \textit{intentService} welcher von der Klasse \textit{Service} erbt. Der Lebenszyklus eines \textit{intentService} ist in Abbildung \ref{fig:lifetime} abgebildet. Hierbei wird ersichtlich, dass diese Art von Service nicht immer im Hintergrund aktiv ist. Nur wenn ein Client an der Service gebunden ist wird, ist dieser aktiv. Im Gegensatz zu seiner Basisklasse, wobei ein Aufruf von \textit{stopService()} genügt um diesen zu beenden, wird ein \textit{intentService} erst beendet, wenn sich alle Clients entbunden haben.
+Da der in diesem Projekt genutzte Service nicht immer aktiv sein soll, wird hier auf eine besondere Art eines Service zurückgegriffen. Bei dieser Art von Hintergrunddienst handelt es sich um einen in \textit{Bound Service} welcher von der Klasse \textit{Service} ist. \\
+Man kann einen \textit{Bound Service} als Server einer Client-Server-Schnittstelle betrachten. Dies ermöglicht den Android Komponenten sich an einen Service zu binden und so Anfragen zu senden und Antworten zu erhalten. Ebenso kann durch dies eine \textit{Interprocess Communication (IPC)} realisiert werden, was bei normalen Services nur mit erhöhtem Aufwand oder mit \textit{Android Interface Definition Language (AIDL)} möglich wäre. \\
+Um zwischen einem herkömmlichen und einem \textit{Bound Service} zu unterscheiden, müssen nur verschiedene Methoden implementiert werden. Der Lebenszyklus eines \textit{Bound Service} ist in Abbildung \ref{fig:lifetime} abgebildet. \\
+Hierbei wird ersichtlich, dass diese Art von Service nicht immer im Hintergrund aktiv ist. Nur wenn ein Client an den Service gebunden ist wird, ist dieser aktiv. Im Gegensatz zu einem herkömmlichen Service, wobei ein Aufruf von \textit{stopService()} genügt um diesen zu beenden, wird ein \textit{Bound Service} erst beendet, wenn sich alle Clients entbunden haben.
 \begin{figure}
     \centering 
-    \includegraphics[width=3.0in]{bilder/intentservice.png}
-    \caption{Lebenszyklus eines \textit{intentService}}
+    \includegraphics[width=3.0in]{bilder/boundservice.png}
+    \caption{Lebenszyklus eines \textit{Bound Service}}
     \label{fig:lifetime}
 \end{figure}
 \subsection{Service Logik}
@@ -132,15 +135,12 @@ Folgende Skripts werden bei der Installation erstellt:
 \end{itemize}
 Alle Skripte werden ausschließlich von später gezeigten Arbeiter-Thread genutzt. Wobei \textit{removeCaptureFiles.sh} lediglich zum entfernen der anfallenden Log-Datei genutzt wird. \\ Das Starten und Stoppen von \textit{airodump-ng} wird durch die beiden anderen Skripte veranlasst, wobei \textit{startCapture.sh} wie in Listing \ref{lst:sh} einige Parameter enthält. Unter anderem wird hier das Ausgabeformat festgelegt und der \textit{WNIC} Name angegeben. Des weiteren werden die Umgebungsvariablen ergänzt um gewisse Bibliotheken für \textit{airodump-ng} bereitzuhalten um eine fehlerfreie Ausführung zu gewähren.
 \begin{lstlisting}[caption={Airodump-ng Parameter}\label{lst:sh},captionpos=t] 
-export PATH=
- $PATH:/data/data/com.bcmon.bcmon/files/tools
-export LD_LIBRARY_PATH=
- $LD_LIBRARY_PATH:/data/data/com.bcmon.bcmon/files/libs
-export LD_PRELOAD=
- /data/data/com.bcmon.bcmon/files/libs/
- libfake_driver.so
+export PATH = $PATH:/data/data/com.bcmon.bcmon/files/tools
+export LD_LIBRARY_PATH = 
+  $LD_LIBRARY_PATH:/data/data/com.bcmon.bcmon/files/libs
+export LD_PRELOAD = /data/data/com.bcmon.bcmon/files/libs/libfake_driver.so
 airodump-ng -w /datadata/de.uulm.miss/files/capture 
- --output-format csv -w capture wlan0 2>&1
+  --output-format csv -w capture wlan0 2>&1
  \end{lstlisting}
 In der nachfolgenden Auflistung werden alle Klassen und eine dazugehörige Beschreibung des MISS aufgeführt.\\ \\
 \begin{center}
@@ -170,5 +170,91 @@ Für die Nutzung des Service müssen folgende Punkte erfüllt sein:
 \item MISS installiert und \textit{root} Rechte bewilligt.
 \item Via bcmon aktivierter \textit{Monitor Mode}
 \end{itemize}
-\subsection{Anwendungsprogramm PAR}\label{lab:par}
+Für eine Nutzung des MISS innerhalb einer Anwendung müssen nicht viele Änderungen vorgenommen werden. Die Klasse welche mit dem Service letztendlich Kommuniziert soll, muss das Interface \textit{ServiceConnection} implementieren.\\
+Hierbei müssen die Methoden \textit{onServiceConnected(ComponentName name, IBinder service)} und \textit{onServiceDisconnected(ComponentName name)} implementiert werden. Erstere wird aufgerufen wenn die Verbindung zu Service erfolgreich aufgebaut wurde und letztere wenn die Verbindung zum Service abbricht. \\
+\subsubsection{An Service binden}
+Um die Anwendung an den Service zu binden, wird wie in Listing \ref{lst:bind} vorgegangen.\\ Das \textit{ServiceConnection} Objekt ist in diesem Fall die Aktivität, welche \textit{ServiceConnetion} implementiert. Durch den Aufruf von \textit{bindService()} wird die Anwendung an den Service gebunden und die Methode \textit{onServiceConnected()} wird aufgerufen. 
+\begin{lstlisting}[caption={Anwendung an Service binden.}\label{lst:bind},captionpos=t] 
+ ServiceConnection mConnection = this;
+ Intent mIntent = new Intent("de.uulm.miss.MISService");
+ bindService(mIntent, mConnection, Context.BIND_AUTO_CREATE);
+ \end{lstlisting}
+ An dieser Stelle benötigt man dann ein Objekt vom Typ \textit{Messenger}. Dieses Objekte ermöglicht eine Umsetzung für eine nachrichtenbasierte Kommunikation über Prozesse hinweg. Somit lassen sich Nachrichten an den Service übermitteln. Das Objekt wird wie in Listing \ref{lst:msg} initialisiert. Dabei kann sich die Anwendung gleich am Service registrieren. Dies wird mittels einer Nachricht und der entsprechenden Konstanten an den Service übertragen. 
+\begin{lstlisting}[caption={Registrieren der Anwendung am Service}\label{lst:msg},captionpos=t] 
+...
+private final Messenger mMessenger = 
+  new Messenger(new IncomingMessageHandler(this));
+...
+@Override
+public void onServiceConnected(ComponentName name, IBinder service) {
+  mServiceMessenger = new Messenger(service);
+  try {
+    Message regMessage = Message.obtain(null, MSG_REGISTER_APPLICATION);
+    regMessage.replyTo = mMessenger;
+    mServiceMessenger.send(regMessage);
+  } catch (RemoteException e) {
+ 	// In diesem Fall wurde der Service unerwartet beendet,
+ 	// bevor etwas mit ihm gemacht werden konnte.
+  }
+}
+\end{lstlisting}
+ Die Konstanten mit denen zwischen Anwendung und Service kommuniziert werden kann sind im nachfolgenden Aufzählung aufgeführt.
+\begin{itemize}
+\item MSG\_REGISTER\_APPLICATION
+\item MSG\_UNREGISTER\_APPLICATION
+\item MSG\_ADD\_CLIENT
+\item MSG\_ADD\_STATION
+\item MSG\_REMOVE\_CLIENT
+\item MSG\_REMOVE\_STATION
+\item MSG\_FOUND\_DEVICE
+ \end{itemize}
+ Um auch eine Antworten empfangen und verarbeiten zu können. Muss wie in in Listing \ref{lst:msg} Zeile 2 \& 3 das Objekte erstellt werden. Die Klasse \textit{IncomingHandler} erbt von\textit{Handler}, wobei dann die Methode \textit{handleMessage()} überschrieben werden um die von Entwickler gewünschten Aktionen durchführen zu können. Eine Implementierung von \textit{Handler} könnte dann wie in Listing \ref{lst:handle} aussehen. In diesem Fall wird überprüft ob ein Gerät gefunden wurde. Ist dies der Fall wird eine neue Nachricht gesendet damit der Service das Gerät aus seiner Liste von suchenden entfernt. 
+\begin{lstlisting}[caption={Behandelt Nachrichten die MISS an die Anwendung sendet.}\label{lst:handle},captionpos=t] 
+private class IncomingMessageHandler extends Handler {
+  MainActivity main;
+  public IncomingMessageHandler(MainActivity parent) {
+     main = parent;
+  }
+  @Override
+  public void handleMessage(Message msg) {
+  
+  switch (msg.what) {
+    case MSG_FOUND_DEVICE:
+	  Bundle b = new Bundle();
+	  b.putString("MAC", (String) msg.getData().get("MAC"));
+	  b.putString("Name", (String) msg.getData().get("Name"));
+	  
+	  sendMessageToService(b, MSG_REMOVE_CLIENT);
+      break;
+    default:
+      super.handleMessage(msg);
+    }
+  }
+}
+\end{lstlisting}
+Um Nachrichten zu senden wurde in Listing \ref{lst:handle} die Methode \textit{sendMessageToService} genutzt die in Listing \ref{lst:send} angebildet ist. 
+\begin{lstlisting}[caption={Sendet Nachrichten an den Service}\label{lst:send},captionpos=t] 
+private void sendMessageToService(Bundle data, int action) {
+  if (mServiceMessenger != null) {
+    try {
+      Message msg = Message.obtain(null, action);
+      msg.setData(data);
+      msg.replyTo = mMessenger;
+      mServiceMessenger.send(msg);
+    } 
+    catch (RemoteException e) {
+      ...
+    }
+  }
+}
+\end{lstlisting}
+\section{Anwendungsprogramm PAR}\label{lab:par}
+Um den Service MISS zu Nutzen und Testen wurde im Laufe des Projekts die Anwendung PAR geschrieben. PAR steht in diesem Fall für \textbf{Person Aware Reminder}. Die Anwendung soll ein Einsatzgebiet des Service MISS aufzeigen. Hierbei können Erinnerungen an Personen gebunden werden. \\
+Dabei werden die MAC-Adressen der Smartphone(s) der Besitzer im Adressbuch angegeben. Unter Instantmessenger wird die Adresse unter dem Label \textit{MAC} abgelegt. Das Format sollte aus Großbuchstaben bzw. Zahlen bestehen, wobei die Blöcke durch Doppelpunkte getrennt werden müssen. Des weiteren Erlaubt die Anwendung auch normale Funktionen die eine einfache Erinnerungsanwendung bietet. Unter anderem sind die Zeit- und Ortsabhänige Erinnerungen. Ebenfalls besteht die Möglichkeit einfache Notizen zu schreiben. In der Abbildung \ref{fig:par} sind Auszüge aus der Anwendung zu sehen. 
+\begin{figure}[h!]
+    \centering 
+    \includegraphics[width=5.0in]{bilder/par.png}
+    \caption{Screenshots der Anwendung PAR und Notifikation in der Statusleiste.}
+    \label{fig:par}
+\end{figure}
 \end{document}
