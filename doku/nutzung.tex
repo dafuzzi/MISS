@@ -6,6 +6,7 @@
 \usepackage{booktabs}
 \usepackage{color}
 \usepackage{tabulary}
+\usepackage{url}
 
  \lstset{language=Java,
           showstringspaces=false,
@@ -40,14 +41,14 @@ Sobald sich eines der gesuchten Geräte in der Nähe befindet und erkannt wird, 
 \chapter{Grundlagen}
 Um die Funktionsweise des Service genauer verstehen zu können, sollten zunächst einige Grundlagen erklärt werden. In diesem Abschnitt werden die vom Service genutzten Technologien kurz beschrieben. Da dies keine vollständige Beschreibung darstellt, sollten die Technologien in ihren Grundzügen bekannt sein. 
 \section{Kabellose Kommunikation}
-Die Anzahl der Geräte die mithilfe von WLAN kommunizieren nehmen ständig zu. Bei einem Großteil dieser Geräte wird das \textit{WNIC}\footnote{Wireless Network Interface Controller}, manchmal trotz limitierter Ressourcen, nicht abgeschaltet. Trotz verschlüsselter Verbindungen werden definiert durch den \textit{IEEE 802.11} Standard einige Daten in Klartext übertragen. Diese Daten werden von MISS genutzt um Geräte in der Nähe zu erkennen und bekannte zu identifizieren. \\
-Durch den \textit{IEEE 802.11} Standard werden auf der Sicherungsschicht des \textit{OSI-Modell} Datagramme, sogenannte \textit{Frames} definiert welche in spezielle Teile unterteilt sind. Jeder \textit{Frame} enthält ein \textit{MAC-Header} Feld, in dem die Absender MAC-Adresse im Klartext dargestellt ist. Durch belauschen der umliegenden Kommunikation kann so nach einer bestimmten MAC-Adresse gesucht werden. \\
+Die Anzahl der Geräte die mithilfe von WLAN kommunizieren nehmen ständig zu. Bei einem Großteil dieser Geräte wird das \textit{WNIC}\footnote{Wireless Network Interface Controller}, manchmal trotz limitierter Ressourcen, nicht abgeschaltet. Trotz verschlüsselter Verbindungen werden definiert durch den \textit{IEEE 802.11}\cite{IEEE} Standard einige Daten in Klartext übertragen. Diese Daten werden von MISS genutzt um Geräte in der Nähe zu erkennen und bekannte zu identifizieren. \\
+Durch den \textit{IEEE 802.11} Standard werden auf der Sicherungsschicht des \textit{OSI-Modell}\cite{OSI}  Datagramme, sogenannte \textit{Frames} definiert welche in spezielle Teile unterteilt sind. Jeder \textit{Frame} enthält ein \textit{MAC-Header} Feld, in dem die Absender MAC-Adresse im Klartext dargestellt ist. Durch belauschen der umliegenden Kommunikation kann so nach einer bestimmten MAC-Adresse gesucht werden. \\
 Aber nicht nur Geräte die im Moment Daten austauschen können erkannt werden, sonder auch Geräte die inaktiv sind. Jedes WLAN fähige Gerät senden abhängig von der Implementierung des \textit{WNIC} Treibers periodische Pakete aus. Diese Pakete gehören zu der Gruppe der \textit{Managementframes}. \\
 Bei den \textit{probe request frames} handelt es sich um Pakete, die von \textit{Clients} gesendet werden, um Informationen über naheliegende Netzwerke zu sammeln. Durch die Angabe einer \textit{SSID}\footnote{Service Set Identifier} kann im Kommunikationsbereich des Gerätes nach bestimmten Netzwerken gesucht werden. Aber auch durch Angabe der \textit{broadcast SSID} kann nach allen Netzwerken gesucht werden, die dieses Paket empfangen und darauf Antworten. Diese Pakete werden versendet egal ob das Gerät bereits mit einem Netzwerk verbunden ist oder nicht.\\
 \textit{Stations} senden sogenannte \textit{beacon frames} aus. Damit geben sie periodisch ihre Präsenz, \textit{SSID} und andere Parameter bekannt. \\
 Im Standard Betriebsmodus eines \textit{WNIC} ist es nicht vorgesehen, dass Pakete, die an andere MAC-Adressen gerichtet sind an höhere Schichten, bezogen auf das \textit{OSI-Modell}, weitergeleitet werden. Diese Pakete werden bereits auf der zweiten Schicht dem \textit{Data Link Layer} im \textit{WNIC} verworfen. Damit aber auch diese Pakete weitergeleitet werden, ist es notwendig den Betriebsmodus des \textit{WNIC} auf den sogenannten \textit{Monitor Mode} zu setzten. Dieser Modus wird über den Treiber des \textit{WNIC} eingestellt um muss dort aber auch implementiert sein. 
 \subsection{Airodump-ng}\label{lab:airodump-ng}
-\textit{Airodump-ng}\footnote{http://www.aircrack-ng.org/doku.php?id=airodump-ng} ist ein Kommandozeilenprogramm welches für das erfassen von \textit{IEEE 802.11 frames} genutzt wird und Bestandteil der \textit{Aircrack-ng suit}\footnote{http://www.aircrack-ng.org}. Mit diesem Programm lassen sich Log-Dateien erstellen, welche Informationen über alle erfassten \textit{Stations} und \textit{Clients} enthalten. Eine Auszug von solch einer Log-Datei ist in Abbildung \ref{fig:log_file} zusehen. Die nachfolgenden Auflistungen beschreiben stichpunktartig die erfassbaren Daten für \textit{Stations} und \textit{Clients}.\\ \\
+\textit{Airodump-ng}\cite{Airodump-ng} ist ein Kommandozeilenprogramm welches für das erfassen von \textit{IEEE 802.11 frames} genutzt wird und Bestandteil der \textit{Aircrack-ng suit}\cite{Aircrack-ng}. Mit diesem Programm lassen sich Log-Dateien erstellen, welche Informationen über alle erfassten \textit{Stations} und \textit{Clients} enthalten. Eine Auszug von solch einer Log-Datei ist in Abbildung \ref{fig:log_file} zusehen. Die nachfolgenden Auflistungen beschreiben stichpunktartig die erfassbaren Daten\cite{Airodump-ng} für \textit{Stations} und \textit{Clients}.\\ \\
 \begin{figure}
     \centering
     \includegraphics[width=5.0in]{bilder/log.png}
@@ -94,7 +95,7 @@ Probed ESSIDs & ESSID die der \textit{Client} sucht \\
 \end{center}
 \section{Android}
 Bevor der eigentliche Hintergrunddienst installiert werden kann, müssen einige Vorbereitungen getroffen werden. Da Google in seinem offenen Betriebssystem Android keine Möglichkeit bietet einen \textit{Monitor Mode} zu aktivieren, implementieren die Hersteller in ihren Gerätetreibern diesen auch nicht.\\
-Aktuell gibt es kein Android Gerät, welches einen \textit{WNIC} besitzt, für den es einem vom Hersteller implementierten \textit{Monitor Mode} gibt. Für bestimmte Chipsätze des Herstellers Broadcom gibt es eine kleine Gruppe von Programmierer, die für die Chipsätze \textit{BCM4330} und \textit{BCM4329} eine neue Firmware geschrieben haben um eben diesen Modus zu aktivieren. Momentan werden folgende Geräte mit diesem Chipsatz unterstützt:
+Aktuell gibt es kein Android Gerät, welches einen \textit{WNIC} besitzt, für den es einem vom Hersteller implementierten \textit{Monitor Mode} gibt. Für bestimmte Chipsätze des Herstellers Broadcom\cite{Broadcom} gibt es eine kleine Gruppe von Programmierer, die für die Chipsätze \textit{BCM4330}\cite{BCM4330} und \textit{BCM4329}\cite{BCM4329} eine neue Firmware geschrieben haben um eben diesen Modus zu aktivieren. Momentan werden folgende Geräte mit diesem Chipsatz unterstützt\cite{bcmonBlog}:
 \begin{itemize}
 \item Samsung Galaxy GS1 mit Cyanogen 7
 \item Samsung Galaxy GS2 mit Cyanogen 9 oder Cynaogen 10
@@ -102,18 +103,18 @@ Aktuell gibt es kein Android Gerät, welches einen \textit{WNIC} besitzt, für d
 \item Asus Nexus 7 mit Cyanogen 7
 \end{itemize}
 \subsection{Cyanogen}
-Alle zuvor aufgelisteten Geräte nutzen Cyanogen\footnote{http://www.cyanogenmod.org}. Cyanogen ist eine erweiterte \textit{open source} Firmware Distribution für Smartphones und Tablets, welche auf den Android Betriebssystem basiert. Cyanogen bietet Eigenschaften und Erweiterungen die es in der offiziellen oder in der von Herstellern mit ausgelieferten Firmware nicht gibt. \\
+Alle zuvor aufgelisteten Geräte nutzen Cyanogen\cite{Cyanogen}. Cyanogen ist eine erweiterte \textit{open source} Firmware Distribution für Smartphones und Tablets, welche auf den Android Betriebssystem basiert. Cyanogen bietet Eigenschaften und Erweiterungen die es in der offiziellen oder in der von Herstellern mit ausgelieferten Firmware nicht gibt. \\
 Um Cyanogen auf einem unterstützten Gerät zu installieren, muss es zuvor \textit{gerootet} werden. Diese bedeutet, das man alle Rechte erlangt was normalerweise auch aus Sicherheitsgründen nicht vorgesehen ist. 
 \subsection{bcmon.apk}
-Nachdem das Gerät \textit{gerootet} wurde und Cyanogen installiert ist. Wird ein zusätzliches Programm installiert, mit dessen Hilfe der \textit{Monitor Mode} aktiviert werden kann. Das Programm \textit{bcmon} enthält dabei eine neuen Treiber für den \textit{WNIC} indem der \textit{Monitor Mode} und weitere Modi implementiert sind. Anschließend ist das Gerät für die Verwendung des MISS Hintergrunddienstes vorbeireitet. 
+Nachdem das Gerät \textit{gerootet} wurde und Cyanogen installiert ist. Wird ein zusätzliches Programm installiert, mit dessen Hilfe der \textit{Monitor Mode} aktiviert werden kann. Das Programm \textit{bcmon}\cite{bcmon.apk} enthält dabei eine neuen Treiber für den \textit{WNIC} indem der \textit{Monitor Mode} und weitere Modi implementiert sind. Anschließend ist das Gerät für die Verwendung des MISS Hintergrunddienstes vorbeireitet. 
 \chapter{Architektur und Implementierung}
-In diesem Kapitel wird zunächst die grundlegende Architektur des verwendeten Dienstes erläutert und anschließend auf die Implementierung eingegangen. Dieses und nachfolgende Kapitel setzten voraus, dass Grundlagen der Programmierung in Java und Android bekannt sind. Sind diese nicht vorhanden, wird an dieser Stelle auf die Android-Entwicklerseite\footnote{http://developer.android.com} verwiesen. 
+In diesem Kapitel wird zunächst die grundlegende Architektur des verwendeten Dienstes erläutert und anschließend auf die Implementierung eingegangen. Dieses und nachfolgende Kapitel setzten voraus, dass Grundlagen der Programmierung in Java und Android bekannt sind. Sind diese nicht vorhanden, wird an dieser Stelle auf die Android-Entwicklerseite\cite{AndroidDeveoper} verwiesen. 
 \section{Architektur}
 Dieser und darauffolgende Abschnitte erklären die Funktionsweise des Service, so wie er auch implementiert wurde. Daher ist auch die Dokumentation des Quelltextes des Services hilfreich und es wird empfohlen auch dies ergänzend hierzu zu lesen. 
 \subsection{Android Bound Service}
 Ein Service ist eine im Hintergrund laufende Komponente welche keine direkte Interaktion mit einem Nutzer besitzt. Da ein Service kein Benutzeroberfläche benötigt, ist dieser auch nicht an den Lebenszyklus einer \textit{activity} gebunden. Im Allgemeinen werden Services genutzt um wiederkehrende und potentiell lange andauernde Aufgaben zu erledigen, wie Beispielsweise das herunterladen von Inhalten aus dem Internet oder das aktualisieren von Daten. Ebenfalls werden Services mit einer höheren Priorität ausgeführt, als Anwendungen die sich im Hintergrund befinden. Ebenfalls ist es unwahrscheinlicher, dass sie vom Betriebssystem abgeschaltet werden. \\
 Zusätzlich können Services unter Android so Konfiguriert werden, dass sie neu gestartet werden sollte das Betriebssystem sie beenden. \\
-Da der in diesem Projekt genutzte Service nicht immer aktiv sein soll, wird hier auf eine besondere Art eines Service zurückgegriffen. Bei dieser Art von Hintergrunddienst handelt es sich um einen in \textit{Bound Service} welcher von der selben Klasse wie ein normaler \textit{Service} ist. \\
+Da der in diesem Projekt genutzte Service nicht immer aktiv sein soll, wird hier auf eine besondere Art eines Service zurückgegriffen. Bei dieser Art von Hintergrunddienst handelt es sich um einen in \textit{Bound Service}\cite{BoundService} welcher von der selben Klasse wie ein normaler \textit{Service} ist. \\
 Man kann einen \textit{Bound Service} als Server einer Client-Server-Schnittstelle betrachten. Dies ermöglicht den Android Komponenten sich an einen Service zu binden und so Anfragen zu senden und Antworten zu erhalten. Ebenso kann durch dies eine \textit{Interprocess Communication (IPC)} realisiert werden, was bei normalen Services nur mit erhöhtem Aufwand oder mit der \textit{Android Interface Definition Language (AIDL)} möglich wäre. \\
 Um zwischen einem herkömmlichen und einem \textit{Bound Service} zu unterscheiden, müssen nur verschiedene Methoden implementiert werden. Der Lebenszyklus eines \textit{Bound Service} ist in Abbildung \ref{fig:lifetime} abgebildet. \\
 Hierbei wird ersichtlich, dass diese Art von Service nicht immer im Hintergrund aktiv ist. Nur wenn ein Client an den Service gebunden ist wird, ist dieser aktiv. Im Gegensatz zu einem herkömmlichen Service, bei dem ein Aufruf von \textit{stopService()} genügt um diesen zu beenden, wird ein \textit{Bound Service} erst beendet, wenn sich alle Clients entbunden haben.
@@ -139,7 +140,7 @@ Befinden sich danach keine gesuchten Geräte mehr im Dienst, beendet dieser den 
     \label{fig:uml}
 \end{figure}
 \section{Implementierung}
-Für die Implementierung der voran gezeigten Architektur wurde das Eclipse ADT\footnote{http://developer.android.com/sdk/index.html} verwendet. Als Zielgerät wurde das Samsung Galaxy GS1 mit Cyanogen 7 gewählt. Hierbei war zu beachten, das bei der Programmierung nur Eigenschaften bis API Level 10 genutzt wurden. Dies liegt an der geringen Android Version 2.3.3 welche dem Cyanogen 7 Mod zu Grunde liegt. \\
+Für die Implementierung der voran gezeigten Architektur wurde das Eclipse ADT\cite{ADT} verwendet. Als Zielgerät wurde das Samsung Galaxy GS1\cite{S1} mit Cyanogen 7 gewählt. Hierbei war zu beachten, das bei der Programmierung nur Eigenschaften bis API Level 10 genutzt wurden. Dies liegt an der geringen Android Version 2.3.3 welche dem Cyanogen 7 Mod zu Grunde liegt. \\
 Da im späteren Betrieb des Service Skripte benötigt werden, wurden diese zur besseren Kapselung und Entwicklung als \textit{.sh} Datei in \textit{assets} gespeichert. Dies hat den entscheidenden Vorteil, dass die programmatisch generiert werden können und nicht nach der Installation von Nutzer im Programmverzeichnis abgelegt werden müssen.\\ Ist die Luftschnittstelle auf einen anderen Gerät nicht unter der Standard Bezeichnung \textit{wlan0} zu finden, so kann dies bequem in den Skripts des Projekts geändert werden. \\ 
 Folgende Skripts werden bei der Installation erstellt:
 \begin{itemize}
@@ -272,4 +273,6 @@ Dabei werden die MAC-Adressen der Smartphone(s) der Besitzer im Adressbuch angeg
     \caption{Screenshots der Anwendung PAR und Notifikation in der Statusleiste.}
     \label{fig:par}
 \end{figure}
+\bibliographystyle{plain}
+\bibliography{document}
 \end{document}

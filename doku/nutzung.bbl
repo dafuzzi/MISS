@@ -1,0 +1,91 @@
+\begin{thebibliography}{10}
+
+\bibitem{OSI}
+ITU-T Study~Group 17.
+\newblock Itu-t x.200.
+\newblock \url{http://handle.itu.int/11.1002/1000/2820}, September 1994.
+\newblock zuletzt besucht am \today.
+
+\bibitem{Aircrack-ng}
+Aircrack-ng.
+\newblock Aircrack-ng suite.
+\newblock \url{http://www.aircrack-ng.org}, April 2014.
+\newblock zuletzt besucht am \today.
+
+\bibitem{Airodump-ng}
+Aircrack-ng.
+\newblock Airodump-ng documentation.
+\newblock \url{http://www.aircrack-ng.org/doku.php?id=airodump-ng}, April 2014.
+\newblock zuletzt besucht am \today.
+
+\bibitem{bcmonBlog}
+bcmon authors.
+\newblock bcmon blog.
+\newblock \url{http://bcmon.blogspot.de}.
+\newblock zuletzt besucht am \today.
+
+\bibitem{bcmon.apk}
+bcmon authors.
+\newblock Monitor mode for broadcom wifi chipsets.
+\newblock \url{https://code.google.com/p/bcmon}.
+\newblock zuletzt besucht am \today.
+
+\bibitem{BCM4329}
+Broadcom Corporation.
+\newblock Bcm4329 technische informationen.
+\newblock
+  \url{http://www.broadcom.com/products/Wireless-LAN/802.11-Wireless-LAN-Solutions/BCM4329}.
+\newblock zuletzt besucht am \today.
+
+\bibitem{BCM4330}
+Broadcom Corporation.
+\newblock Bcm4330 technische informationen.
+\newblock
+  \url{http://www.broadcom.com/products/Wireless-LAN/802.11-Wireless-LAN-Solutions/BCM4330}.
+\newblock zuletzt besucht am \today.
+
+\bibitem{Broadcom}
+Broadcom Corporation.
+\newblock Internetpräsenz.
+\newblock \url{http://www.broadcom.com/company}.
+\newblock zuletzt besucht am \today.
+
+\bibitem{Cyanogen}
+Cyanogenmod.
+\newblock Cyanogenmod website.
+\newblock \url{http://www.cyanogenmod.org}.
+\newblock zuletzt besucht am \today.
+
+\bibitem{S1}
+Samsung Group.
+\newblock Technical specs of samsung galaxy s i9000.
+\newblock
+  \url{http://www.samsung.com/de/consumer/mobile-device/mobilephones/archive-mobile-phones/GT-I9000HKDDBT}.
+\newblock zuletzt besucht am \today.
+
+\bibitem{IEEE}
+IETF.
+\newblock Rfc5416.
+\newblock \url{http://tools.ietf.org/html/rfc5416}, März 2009.
+\newblock zuletzt besucht am \today.
+
+\bibitem{ADT}
+Eclipse Foundation &~Google Inc.
+\newblock Eclipse and android developer tools bundle.
+\newblock \url{http://developer.android.com/sdk/index.html}.
+\newblock zuletzt besucht am \today.
+
+\bibitem{AndroidDeveoper}
+Google Inc.
+\newblock Android developer site.
+\newblock \url{http://developer.android.com}.
+\newblock zuletzt besucht am \today.
+
+\bibitem{BoundService}
+Google Inc.
+\newblock Bound services on android developer.
+\newblock
+  \url{http://developer.android.com/guide/components/bound-services.html}.
+\newblock zuletzt besucht am \today.
+
+\end{thebibliography}
