@@ -6,22 +6,22 @@
 
 \f0\fs24 \cf0 https://www.websequencediagrams.com\
 \
-Nutzer ->+ Anwendung I: Startet Anwendung\
-Anwendung I ->+ Service: Bindet sich an Dienst\
+Nutzer ->+ Anwendung: Startet Anwendung\
+Anwendung ->+ Service: Bindet sich an Dienst\
 note right of Service\
 Falls Dienst nicht gestartet, \
 wird dieser gestartet.\
 end note\
-Service -> Anwendung I:\
-Anwendung I -> Service: Suche Ger\'e4t\
-Service -> Anwendung I:\
+Service -> Anwendung:\
+Anwendung -> Service: Suche Ger\'e4t\
+Service -> Anwendung:\
 Service ->+ Thread / Logik: Starte Thread\
-Nutzer -> Anwendung I: Schlie\'dft Anwendung\
-Anwendung I ->- Nutzer:\
-Thread / Logik -->+ Capture Tool: start\
+Nutzer -> Anwendung: Schlie\'dft Anwendung\
+Anwendung ->- Nutzer:\
+Thread / Logik ->+ Capture Tool: start\
 note right of Capture Tool: erstellt Logfile\
-Thread / Logik --> Capture Tool: stop\
-Capture Tool -->- Thread / Logik: \
+Thread / Logik -> Capture Tool: stop\
+Capture Tool ->- Thread / Logik: \
 note right of Thread / Logik: Analysiere Logfile.\
 note right of Thread / Logik\
 Erstelle Client\
@@ -36,20 +36,20 @@ note right of Thread / Logik\
 Bei Fund benachrichtige Service.\
 end note\
 Thread / Logik -> Service: Liste gesuchter Ger\'e4te\
-Service ->+ Anwendung I: Ger\'e4t gefunden\
-Anwendung I -> Service: entferne Ger\'e4t\
+Service ->+ Anwendung: Ger\'e4t gefunden\
+Anwendung -> Service: entferne Ger\'e4t\
 Service -> Thread / Logik: Thread stoppen\
 Thread / Logik ->- Service:\
-Anwendung I -> Service: Entbindet sich von Dienst\
+Anwendung -> Service: Entbindet sich von Dienst\
 note right of Service\
 Falls keine weiteren\
 Clients gebunden sind\
 wird der Dienst beendet.  \
 end note \
-Service ->- Anwendung I:\
-note right of Anwendung I\
+Service ->- Anwendung:\
+note right of Anwendung\
 Benachrichtigung an das \
 Notificationsystem von\
 Android.\
 end note\
-Anwendung I ->- Nutzer: Notificationbar Info}
+Anwendung ->- Nutzer: Notificationbar Info}
